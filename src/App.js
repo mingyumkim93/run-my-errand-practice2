@@ -1,26 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
-function App() {
+import MenuBar from './MenuBar';
+import Main from './Main';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
+
+ 
+export default function App() {
+  const [coordinates, setCoordinates] = React.useState({lat: 60.1699, lng: 24.9384});
+  //<Map coordinates={coordinates}/>
+  //<PlaceSearchinput setCoordinates={setCoordinates}/>
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+      <MenuBar/> 
+        <Switch>
+          <Route exact path="/" component={Main}/>
+          <Route path="/signin" component={SignIn}/>
+          <Route path="/signup" component={SignUp}/>
+        </Switch>
+      </Router>
     </div>
   );
 }
 
-export default App;
+ 
