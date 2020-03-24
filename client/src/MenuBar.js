@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 
 export default function MenuBar() {
 
@@ -20,7 +22,7 @@ export default function MenuBar() {
         <div className="dropdown-menu-item" style={{display:"none", position:"absolute"}}>
           <div>Serach</div>
           <div>My errand</div>
-          <div>item 3</div> 
+          <div onClick={()=>axios.get("/api/hello").then((res)=>console.log(res))}>server test</div> 
         </div>
       </div>
       <div className="dropdown-menu" style={{ flexBasis: "150px" }} onMouseEnter={(e)=>onMenuHover(e)} onMouseLeave={()=>onMenuLeave()}>For Poster
