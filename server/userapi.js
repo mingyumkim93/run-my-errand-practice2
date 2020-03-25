@@ -1,29 +1,27 @@
-module.exports = function (app, mysqlConn, bcrypt) {
+const bcrypt = require("bcrypt");
+const userDao = require("./userdao");
 
-    app.post("/api/user", (req, res) => {
-        //check if the username already taken
-        //if not,
-        const saltRounds = 10;
+async function hashPassword(req, res) {
+    const saltRounds = 10;
+    const hashedPassword = await new Promise((resolve, reject) => {
         bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
             if (err) {
-                console.log("Password hashing failed")
+                reject(err);
                 res.send(err);
             }
-            else{
-                req.body.password = hash;
-                mysqlConn.query("insert into user set ?", req.body, function(err){
-                    if(err) {
-                        console.log("MySQL Error");
-                        res.send(err);
-                    }
-                    else {
-                        console.log("New user has been created: ", req.body);
-                        res.sendStatus(200);
-                    }
-                });
-            }
+            resolve(hash);
         });
-        
-    });
+    })
+    return hashedPassword;
+};
 
+module.exports = function (app) {
+        app.post("/api/user", (req, res) => {
+            //check if the username already taken
+            //if not,
+            hashPassword(req, res).then(hashedPassword=>{
+                req.body.password = hashedPassword;
+                userDao.createNewUser(req.body, res);
+            });
+        });
 }
