@@ -2,18 +2,19 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 
 import MenuBar from './MenuBar';
 import Main from './Main';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import Search from './Search';
+import Post from './Post';
 
  
 export default function App() {
-  const [coordinates, setCoordinates] = React.useState({lat: 60.1699, lng: 24.9384});
+  //const [coordinates, setCoordinates] = React.useState({lat: 60.1699, lng: 24.9384});
   //<Map coordinates={coordinates}/>
   //<PlaceSearchinput setCoordinates={setCoordinates}/>
 
@@ -25,6 +26,8 @@ export default function App() {
           <Route exact path="/" component={Main}/>
           <Route path="/signin" component={SignIn}/>
           <Route path="/signup" component={SignUp}/>
+          <Route path="/search" component={Search}/>
+          <Route path="/post" component={Post}/>
         </Switch>
       </Router>
     </div>

@@ -4,7 +4,9 @@ export default function SignUp() {
 
     return(
         <div>
-            SignUp
+            <input placeholder="ID"></input>
+            <input placeholder="Password" type="password"></input>
+            <button>Sign up</button>
         </div>
     )
 
