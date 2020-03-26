@@ -6,6 +6,9 @@
 /.pnp
 .pnp.js
 
+# API
+/client/.env
+
 # testing
 /coverage
 

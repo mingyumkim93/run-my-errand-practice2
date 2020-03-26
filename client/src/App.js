@@ -12,16 +12,13 @@ import SignUp from './SignUp';
 import Search from './Search';
 import Post from './Post';
 
- 
 export default function App() {
-  //const [coordinates, setCoordinates] = React.useState({lat: 60.1699, lng: 24.9384});
   //<Map coordinates={coordinates}/>
   //<PlaceSearchinput setCoordinates={setCoordinates}/>
-
   return (
     <div className="App">
-      <Router>
-      <MenuBar/> 
+      <Router>  
+      <MenuBar/>
         <Switch>
           <Route exact path="/" component={Main}/>
           <Route path="/signin" component={SignIn}/>
