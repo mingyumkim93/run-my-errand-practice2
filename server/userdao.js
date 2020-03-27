@@ -1,14 +1,19 @@
 const mysqlConn = require("./mysqlhelper");
 
 const userDao = {
-    createNewUser(userInfo,res){
-        mysqlConn.query("insert into user set ?", userInfo, (err) =>{
-            if(err){
-                console.log("MySQL Error");
-                res.send(err);
-            }
-            else
-                res.sendStatus(200);
+    createNewUser(user,cb){
+        mysqlConn.query("insert into user set ?", user, (error,data) =>{
+            cb(error, data);
+        });
+    },
+    getUserById(id,cb){
+        mysqlConn.query("select * from user where id = ?", id, (error,data) =>{
+            cb(error, data);
+        });
+    },
+    getUserByUsername(username,cb){
+        mysqlConn.query("select * from user where username = ?", username, (error,data) =>{
+            cb(error, data);
         });
     }
 }

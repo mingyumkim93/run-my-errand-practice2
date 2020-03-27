@@ -9,9 +9,4 @@ const mysqlConn = mysql.createConnection({
     database: 'crm'
 });
 
-mysqlConn.connect(function(err){
-    if(err) throw err;
-    console.log("mysql database connected!")
-});
-
 module.exports = mysqlConn;

@@ -17,11 +17,20 @@ async function hashPassword(req, res) {
 
 module.exports = function (app) {
         app.post("/api/user", (req, res) => {
-            //check if the username already taken
-            //if not,
-            hashPassword(req, res).then(hashedPassword=>{
-                req.body.password = hashedPassword;
-                userDao.createNewUser(req.body, res);
+            userDao.getUserByUsername(req.body.username, function(err, user){
+                user = user[0];
+                if(err) send(err);
+                if(!user){
+                    hashPassword(req, res).then(hashedPassword=>{
+                        req.body.password = hashedPassword;
+                        userDao.createNewUser(req.body, function(err,user){
+                            // find a better way to handle this duplicated code
+                            if(err) res.send(err);
+                            else {res.send(user)}
+                        });
+                    });
+                }
+                if(user) res.sendStatus(401);
             });
         });
 }
