@@ -1,26 +1,28 @@
-const expressSession = require('express-session');
+const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth2');
 const userDao = require('./userdao');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
-module.exports = function(app){
-    app.use(expressSession({
+module.exports = function (app) {
+    app.use(session({
         //TODO: change secret later and hide it.
-        secret:'change later',
-        resave:true,
-        saveUninitialized:true
+        secret: 'change later',
+        resave: false,
+        saveUninitialized: false
     }));
     app.use(passport.initialize());
     app.use(passport.session());
-
+    //TODO : find out why there is cookie even when login failed  => because of session options
     passport.serializeUser(function (user, done) {
         console.log("serialize user ", user);
         done(null, user.id);
     });
 
     passport.deserializeUser(function (id, done) {
-        console.log("deserialize user id: ", id);
+        console.log("deserialized user id: ", id);
         userDao.getUserById(id, function (error, data) {
             const user = data[0];
             if (error) console.log("Error happened on querying an user")
@@ -29,23 +31,61 @@ module.exports = function(app){
         });
     });
 
-    passport.use(new LocalStrategy(function(username, password, done){
-        userDao.getUserByUsername(username, function(err, data){
+    passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, function (email, password, done) {
+        userDao.getUserByEmail(email, function (err, data) {
             const user = data[0];
-            if(err) return done(err);
-            if(!user) return done(null, false);
-            if(!bcrypt.compareSync(password, user.password)) return done(null, false);
+            if (err) return done(err);
+            if (!user) return done(null, false);
+            if (!bcrypt.compareSync(password, user.password)) return done(null, false);
+            delete user.password;
             return done(null, user); //login success
         });
     }))
 
-    app.post('/login', passport.authenticate('local',{failureRedirect:'/login_fail'}),function(_,res){
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/auth/google/redirect"
+    }, (accessToken, refreshToken, profile, done) => {
+        console.log("accessToken: ", accessToken);////////////
+        var user = {
+            email: profile.email,
+            firstname: profile.given_name,
+            lastname: profile.family_name,
+            authMethod: profile.provider
+        };
+
+        userDao.getUserByEmail(profile.email, function (error, data) {
+            if (data[0]) {delete data[0].password; done(null, data[0]);}
+            else userDao.createNewUser(user, function (error, data) {
+                user = { ...user, id: data.insertId }
+                console.log(user);
+                done(null, user);
+            });
+        })
+    }));
+
+    app.get('/auth/google', passport.authenticate('google', {
+        scope: ['profile', 'email'],
+    }));
+
+    app.post("/test", (req, res) => {userDao.getUserByEmail(req.body.email,(err,data)=>{console.log(data)}); res.send("????????????????????")});
+    app.get("/api/auth", (req, res) => {if (req.user) res.send("Authenticated!"); else { res.send("NOT authenticated!") } })
+
+    app.get('/auth/google/redirect', passport.authenticate('google', {
+        successRedirect: "http://localhost:3000",
+        failureRedirect: "/auth/login/failed"
+    }));
+
+    app.post('/login', passport.authenticate('local', { failureRedirect: '/login/fail' }), function (_, res) {
         //if authentication was successful, this function will get called.
         console.log("login success");
         res.sendStatus(200);
     });
 
-    app.get('/login_fail',function(_,res){
+    app.get('/api/logout', (req,res) => {req.logout(); res.send("Logout!!")})
+
+    app.get('/login/fail', function (_, res) {
         res.status(401);
         res.send("login failed!")
     });

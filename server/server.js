@@ -13,4 +13,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 auth(app);
 userApi(app);
 
+// app.get('/test',(req, res) => {console.log(req); res.send({express: "test route"})})
+
 app.listen(port, () => console.log(`Listening on port ${port}`));

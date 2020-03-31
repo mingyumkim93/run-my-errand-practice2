@@ -17,10 +17,10 @@ async function hashPassword(req, res) {
 
 module.exports = function (app) {
         app.post("/api/user", (req, res) => {
-            userDao.getUserByUsername(req.body.username, function(err, user){
-                user = user[0];
-                if(err) send(err);
-                if(!user){
+            userDao.getUserByEmail(req.body.email, function(err, data){
+                if(err) res.send(err);
+                if(data[0]) res.send(404);
+                else{ //there is no same existing email in db
                     hashPassword(req, res).then(hashedPassword=>{
                         req.body.password = hashedPassword;
                         userDao.createNewUser(req.body, function(err,user){
@@ -30,7 +30,6 @@ module.exports = function (app) {
                         });
                     });
                 }
-                if(user) res.sendStatus(401);
             });
         });
 }

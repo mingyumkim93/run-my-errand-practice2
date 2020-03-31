@@ -11,8 +11,8 @@ const userDao = {
             cb(error, data);
         });
     },
-    getUserByUsername(username,cb){
-        mysqlConn.query("select * from user where username = ?", username, (error,data) =>{
+    getUserByEmail(email,cb){
+        mysqlConn.query("select * from user where email = ?", email, (error,data) =>{
             cb(error, data);
         });
     }
