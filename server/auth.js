@@ -15,7 +15,7 @@ module.exports = function (app) {
     }));
     app.use(passport.initialize());
     app.use(passport.session());
-    //TODO : find out why there is cookie even when login failed  => because of session options
+    
     passport.serializeUser(function (user, done) {
         console.log("serialize user ", user);
         done(null, user.id);
@@ -25,7 +25,7 @@ module.exports = function (app) {
         console.log("deserialized user id: ", id);
         userDao.getUserById(id, function (error, data) {
             const user = data[0];
-            if (error) console.log("Error happened on querying an user")
+            if (error) console.log("Error happened on querying an user") 
             console.log("data[0] in deserializeUser " + user)
             done(null, user)
         });
@@ -86,7 +86,6 @@ module.exports = function (app) {
     app.get('/api/logout', (req,res) => {req.logout(); res.send("Logout!!")})
 
     app.get('/login/fail', function (_, res) {
-        res.status(401);
-        res.send("login failed!")
+        res.sendStatus(401);
     });
 }

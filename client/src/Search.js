@@ -13,9 +13,12 @@ function loadGoogleMapsTag(callback) {
 export default function Search(props) {
     const [isGoogleMapApiReady, setIsGoogleMapApiReady] = useState(false)
     useEffect(() => {
-        loadGoogleMapsTag(function () {
+        if(document.getElementById("google-maps-api"))
             setIsGoogleMapApiReady(true)
-        });
+        else
+            loadGoogleMapsTag(function () {
+                setIsGoogleMapApiReady(true)
+            });
     }, []);
 
     const [coordinates, setCoordinates] = React.useState({ lat: 60.1699, lng: 24.9384 });
@@ -31,7 +34,6 @@ export default function Search(props) {
             {!isGoogleMapApiReady &&
                 <div>
                     loading..
-                <button onClick={() => console.log(document.getElementById("google-maps-api"))}>asd</button>
                 </div>}
         </div>
     )

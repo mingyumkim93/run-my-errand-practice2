@@ -1,23 +1,24 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
+  Router,
   Switch,
   Route
 } from "react-router-dom";
+import history from './history';
 
 import MenuBar from './MenuBar';
 import Main from './Main';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import Search from './Search';
-import Post from './Post';
+import Post from './Post'; 
 
 export default function App() {
   //<Map coordinates={coordinates}/>
   //<PlaceSearchinput setCoordinates={setCoordinates}/>
   return (
     <div className="App">
-      <Router>  
+      <Router history={history }>  
       <MenuBar/>
         <Switch>
           <Route exact path="/" component={Main}/>
