@@ -1,10 +1,9 @@
-import React from 'react';
+import React  from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
-export default function MenuBar() {
-
+export default function MenuBar(props) {
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector('div').style.display=""
   }
@@ -34,7 +33,16 @@ export default function MenuBar() {
           <div>item C</div>
         </div>
       </div>
-      <div style={{ flexBasis: "100px", marginLeft: "auto"}}><Link to="/signin" style={{textDecoration:"none"}}>Sign in</Link></div>
+      {props.isLoggedIn ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {props.user.firstname}</div> :
+        <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
+      <div style={{ flexBasis: "100px"}}>
+        {props.isLoggedIn ? <div onClick={() => {
+          props.setIsLoggedIn(false);
+          props.setUser({});
+          axios.get('/api/logout').then((res) => console.log(res))
+        }}>Sign out</div> 
+          :  <Link to="/signin" style={{textDecoration:"none"}}>Sign in</Link>}
+      </div>
     </div>
   )
 }

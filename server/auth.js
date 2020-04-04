@@ -70,17 +70,24 @@ module.exports = function (app) {
     }));
 
     app.post("/test", (req, res) => {userDao.getUserByEmail(req.body.email,(err,data)=>{console.log(data)}); res.send("????????????????????")});
-    app.get("/api/auth", (req, res) => {if (req.user) res.send("Authenticated!"); else { res.send("NOT authenticated!") } })
+    app.get("/api/auth", (req, res) => {
+        if (req.user) {
+            delete req.user.password;
+            res.send(req.user);
+        }
+        else res.send(false);
+    });
 
     app.get('/auth/google/redirect', passport.authenticate('google', {
         successRedirect: "http://localhost:3000",
         failureRedirect: "/auth/login/failed"
     }));
 
-    app.post('/login', passport.authenticate('local', { failureRedirect: '/login/fail' }), function (_, res) {
+    app.post('/login', passport.authenticate('local', { failureRedirect: '/login/fail' }), function (req, res) {
         //if authentication was successful, this function will get called.
-        console.log("login success");
-        res.sendStatus(200);
+        delete req.user.password;
+        res.status(200);
+        res.send(req.user);
     });
 
     app.get('/api/logout', (req,res) => {req.logout(); res.send("Logout!!")})
