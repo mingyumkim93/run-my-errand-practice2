@@ -1,13 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import history from './history';
 
 export default function SignIn(props) {
 
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    
     return (
         <div>
             <input placeholder="ID" onChange={(e) => setEmail(e.target.value)}></input>

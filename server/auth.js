@@ -69,7 +69,7 @@ module.exports = function (app) {
         scope: ['profile', 'email'],
     }));
 
-    app.post("/test", (req, res) => {userDao.getUserByEmail(req.body.email,(err,data)=>{console.log(data)}); res.send("????????????????????")});
+    app.get("/api/test", (req, res) => {userDao.getUserByEmail(req.body.email,(err,data)=>{console.log(data)}); res.send("????????????????????")});
     app.get("/api/auth", (req, res) => {
         if (req.user) {
             delete req.user.password;

@@ -22,7 +22,7 @@ export default function MenuBar(props) {
         <div className="dropdown-menu-item" style={{display:"none", position:"absolute", backgroundColor:"white"}}>
         <Link to="/search" style={{textDecoration:"none"}}>Search</Link>
           <div>My errand</div>
-          <div onClick={()=>axios.get("/api/hello").then((res)=>console.log(res))}>server test</div> 
+          <div onClick={()=>axios.get("/api/test").then((res)=>console.log(res))}>server test</div> 
         </div>
       </div>
       <div className="dropdown-menu" style={{ flexBasis: "150px" }} onMouseLeave={()=>onMenuLeave()}>

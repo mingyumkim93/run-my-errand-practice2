@@ -1,12 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
+import history from './history';
 
 export default function SignUp() {
 
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
-    const [firstName, setFirstName] = React.useState("");
-    const [lastName, setLastName] = React.useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
 
     const validationEmail = (email) => {
         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
@@ -24,7 +25,9 @@ export default function SignUp() {
             <input placeholder="Last Name" onChange={(e)=>setLastName(e.target.value)}></input>
             <button onClick={()=>{
                 if(validationEmail(email))
-                axios.post("/api/user",{email,password, firstName, lastName, authMethod:'internal'}).then((res)=>console.log(res))}}>Sign up</button>
+                axios.post("/api/user",{email,password, firstName, lastName, authMethod:'internal'}).then((res)=>console.log(res));
+                history.push('/');
+                }}>Sign up</button>
         </div>
     )
 

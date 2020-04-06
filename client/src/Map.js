@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GoogleMap, Marker, withGoogleMap } from "react-google-maps";
 
 /* eslint-disable no-undef */
 // ??????????????
 export default function Map(props) {
 
-  const WrappedMap = withGoogleMap((props) =>
-    <GoogleMap center={props.latlng} zoom={16}>
-      <Marker position={{ lat: 60.1699, lng: 24.9384 }} />
+  let mapRef;
+  let markerRef;
+  const WrappedMap = withGoogleMap(() =>
+  //todo: try to make map moves and marker is fixed at the center.
+    <GoogleMap ref={(ref) => mapRef = ref} center={props.coordinates} zoom={16}>
+      <Marker ref={(ref) => markerRef = ref } position={props.coordinates} draggable={true}/>
     </GoogleMap>
   );
 
@@ -17,7 +20,6 @@ export default function Map(props) {
         loadingElement={<div style={{ height: "100%" }} />}
         containerElement={<div id="map" style={{ height: "100%" }} />}
         mapElement={<div style={{ height: "100%" }} />}
-        latlng={props.coordinates}
       />
     </div>
   )
