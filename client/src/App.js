@@ -28,11 +28,10 @@ function loadGoogleMapsScript(setIsGoogleMapApiReady){
   }
 };
 
-function checkAuth(setUser,setIsLoggedIn,setIsLoading){
+function checkAuth(setUser,setIsLoading){
   axios.get("/api/auth").then((res) => {
     if (res.data) {
       setUser({ ...res.data });
-      setIsLoggedIn(true);
     }
     setIsLoading(false);
   })
@@ -41,31 +40,30 @@ function checkAuth(setUser,setIsLoggedIn,setIsLoading){
 
 export default function App() {
   
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(undefined);
   const [isGoogleMapApiReady, setIsGoogleMapApiReady] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadGoogleMapsScript(setIsGoogleMapApiReady);
-    checkAuth(setUser,setIsLoggedIn,setIsLoading);
+    checkAuth(setUser,setIsLoading);
   }, []);
 
   if (isLoading) return <div><Loading type={"spokes"} color={"#123123"} /> <h1 style={{ textAlign: "center" }}>Loading...</h1></div> //todo: change to better one
   return (
     <div className="App">
       <Router history={history}>
-        <MenuBar user={user} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
+        <MenuBar user={user}  setUser={setUser} />
         <Switch>
           <Route exact path="/" component={Main} />
           <Route path="/signin" component={() =>
-            isLoggedIn ?
+            user ?
               <Redirect to="/" />
-              : <SignIn setUser={setUser} setIsLoggedIn={setIsLoggedIn} />
+              : <SignIn setUser={setUser}/>
           } />
           <Route path="/signup" component={SignUp} />
           <Route path="/search" component={()=><Search isGoogleMapApiReady={isGoogleMapApiReady}/>} />
-          <Route path="/post" component={() => <Post isLoggedIn={isLoggedIn} isGoogleMapApiReady={isGoogleMapApiReady} />} />
+          <Route path="/post" component={() => <Post user={user} isGoogleMapApiReady={isGoogleMapApiReady} />} />
         </Switch>
       </Router>
     </div>

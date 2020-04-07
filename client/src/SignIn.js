@@ -16,7 +16,6 @@ export default function SignIn(props) {
                 if(res.status ===200 ){
                     let user = res.data;
                     props.setUser(user);
-                    props.setIsLoggedIn(true);
                     history.push('/')}}).catch(err => console.log("err"))}>Sign in</button>
             <button onClick={() => {
                 window.open('http://localhost:5000/auth/google', "_self");

@@ -1,5 +1,6 @@
 import React  from 'react';
 import { Link } from 'react-router-dom';
+//todo change to history
 import axios from 'axios';
 
 
@@ -33,11 +34,10 @@ export default function MenuBar(props) {
           <div>item C</div>
         </div>
       </div>
-      {props.isLoggedIn ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {props.user.firstname}</div> :
+      {props.user ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {props.user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px"}}>
-        {props.isLoggedIn ? <div onClick={() => {
-          props.setIsLoggedIn(false);
+        {props.user ? <div onClick={() => {
           props.setUser({});
           axios.get('/api/logout').then((res) => console.log(res))
         }}>Sign out</div> 

@@ -6,7 +6,7 @@ export default function PlaceSearchinput(props) {
     const handleSelect = async value => {
         const results = await geocodeByAddress(value);
         const latLng = await getLatLng(results[0]);
-        props.setCoordinates(latLng);
+        props.setMapCenter(latLng);
     };
 
     return (
