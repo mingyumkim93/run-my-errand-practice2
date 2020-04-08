@@ -7,7 +7,7 @@ export default function Map(props) {
   let markerRef;
   const WrappedMap = withGoogleMap(() =>
     <GoogleMap ref={(ref) => mapRef = ref} center={props.mapCenter} zoom={16}>
-      <Marker ref={(ref) => markerRef = ref } position={props.mapCenter} onDragEnd={()=>{const precisedCoords = markerRef.getPosition().toJSON(); props.setMapCenter(precisedCoords)}} draggable={true}/>
+      {props.children}
     </GoogleMap>
   );
  
@@ -17,6 +17,7 @@ export default function Map(props) {
         loadingElement={<div style={{ height: "100%" }} />}
         containerElement={<div id="map" style={{ height: "100%" }} />}
         mapElement={<div style={{ height: "100%" }} />}
+        mapCenter={props.mapCenter}
       />
     </div>
   )

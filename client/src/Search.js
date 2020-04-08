@@ -1,11 +1,20 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Map from './Map';
 import PlaceSearchinput from './PlaceSearchInput';
+import {Marker, InfoWindow} from 'react-google-maps';
+import axios from 'axios';
 
 
 export default function Search(props) {
 
-    const [coordinates, setCoordinates] = React.useState({ lat: 60.1699, lng: 24.9384 });
+    const [errands, setErrands] = useState([]);
+    const [mapCenter, setMapCenter] = useState(undefined); 
+    const [selectedMarker, setSelectedMarker] = useState(undefined);
+    useEffect(()=>{
+        axios.get("/api/errands").then(res=>setErrands(res.data)).catch(err=>console.log(err));
+        navigator.geolocation.getCurrentPosition(position => setMapCenter({lat:position.coords.latitude, lng:position.coords.longitude}));
+    },[])
+
     if(!props.isGoogleMapApiReady)
     return(
         <div>Loading...</div>
@@ -14,8 +23,10 @@ export default function Search(props) {
     return (
         <div style={{ margin: "100px" }}>
                 <>
-                    <Map coordinates={coordinates} />
-                    <PlaceSearchinput setCoordinates={setCoordinates} />
+                    <Map mapCenter={mapCenter} >
+                        {errands && errands.map(errand=><Marker key={errand.id} position={JSON.parse(errand.coordinates)} onClick={()=>setSelectedMarker(errand)}/>)}
+                    </Map>
+                    <PlaceSearchinput setMapCenter={setMapCenter} />
                 </>
         </div>
     )

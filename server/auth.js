@@ -17,7 +17,6 @@ module.exports = function (app) {
     app.use(passport.session());
     
     passport.serializeUser(function (user, done) {
-        console.log("serialize user ", user);
         done(null, user.id);
     });
 
@@ -26,7 +25,6 @@ module.exports = function (app) {
         userDao.getUserById(id, function (error, data) {
             const user = data[0];
             if (error) console.log("Error happened on querying an user") 
-            console.log("data[0] in deserializeUser " + user)
             done(null, user)
         });
     });
@@ -47,7 +45,6 @@ module.exports = function (app) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: "/auth/google/redirect"
     }, (accessToken, refreshToken, profile, done) => {
-        console.log("accessToken: ", accessToken);////////////
         var user = {
             email: profile.email,
             firstname: profile.given_name,

@@ -7,4 +7,11 @@ module.exports = function (app) {
             else res.send(data);
         });
     });
+
+    app.get("/api/errands", (req,res) => {
+        errandDao.getAllErrands(function(err,data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
 }
