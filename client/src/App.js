@@ -33,6 +33,7 @@ function checkAuth(setUser,setIsLoading){
     if (res.data) {
       setUser({ ...res.data });
     }
+    console.log("ASD")
     setIsLoading(false);
   })
 };
@@ -53,7 +54,7 @@ export default function App() {
   return (
     <div className="App">
       <Router history={history}>
-        <MenuBar user={user}  setUser={setUser} />
+        <MenuBar user={user} setUser={setUser} />
         <Switch>
           <Route exact path="/" component={Main} />
           <Route path="/signin" component={() =>

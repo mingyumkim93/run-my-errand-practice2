@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import history from './history';
 
 export default function SignIn(props) {
@@ -20,7 +19,7 @@ export default function SignIn(props) {
             <button onClick={() => {
                 window.open('http://localhost:5000/auth/google', "_self");
             }}>login with google</button>
-            <div>First time? Create your account <Link to="/signup">here</Link></div>
+            <div>First time? Create your account <button onClick={()=>history.push("/signup")}>here</button></div>
         </div>
     )
 

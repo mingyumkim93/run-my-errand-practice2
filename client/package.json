@@ -10,6 +10,7 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-google-maps": "^9.4.5",
+    "react-google-places-autocomplete": "^2.0.1",
     "react-loading": "^2.0.3",
     "react-places-autocomplete": "^7.2.1",
     "react-router-dom": "^5.1.2",

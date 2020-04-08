@@ -1,6 +1,6 @@
 import React  from 'react';
-import { Link } from 'react-router-dom';
 //todo change to history
+import history from './history'
 import axios from 'axios';
 
 
@@ -17,19 +17,19 @@ export default function MenuBar(props) {
    
   return (
     <div style={{ borderBottom: "1px solid black", display: "flex", flexDirection: "row", height: "3em", cursor:"pointer"}}>
-      <div style={{ flexBasis: "150px" }}><Link to="/" style={{textDecoration:"none"}}>Logo</Link></div> 
+      <div style={{ flexBasis: "150px" }}><button onClick={()=>history.push("/")}>Logo</button></div> 
       <div className="dropdown-menu" style={{ flexBasis: "150px"}} onMouseLeave={()=>onMenuLeave()}>
-        <Link to="/search" style={{textDecoration:"none"}} onMouseOver={(e)=>onMenuHover(e)} >For Runner</Link>
+        <button onClick={()=>history.push("/search")} onMouseOver={(e)=>onMenuHover(e)} >For Runner</button>
         <div className="dropdown-menu-item" style={{display:"none", position:"absolute", backgroundColor:"white"}}>
-        <Link to="/search" style={{textDecoration:"none"}}>Search</Link>
+        <button onClick={()=>history.push("/search")}>Search</button>
           <div>My errand</div>
           <div onClick={()=>axios.get("/api/test").then((res)=>console.log(res))}>server test</div> 
         </div>
       </div>
       <div className="dropdown-menu" style={{ flexBasis: "150px" }} onMouseLeave={()=>onMenuLeave()}>
-      <Link to="/post" style={{textDecoration:"none"}} onMouseOver={(e)=>onMenuHover(e)}>For Poster</Link>
+      <button onClick={()=>history.push("/post")} onMouseOver={(e)=>onMenuHover(e)}>For Poster</button>
         <div className="dropdown-menu-item" style={{display:"none", position:"absolute", backgroundColor:"white"}}>
-        <Link to="/post" style={{textDecoration:"none"}}>Post</Link>
+        <button onClick={()=>history.push("/post")} >Post</button>
           <div>My errand</div>
           <div>item C</div>
         </div>
@@ -38,10 +38,10 @@ export default function MenuBar(props) {
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px"}}>
         {props.user ? <div onClick={() => {
-          props.setUser({});
+          props.setUser(undefined);
           axios.get('/api/logout').then((res) => console.log(res))
         }}>Sign out</div> 
-          :  <Link to="/signin" style={{textDecoration:"none"}}>Sign in</Link>}
+          :  <button onClick={()=>history.push("/signin")}>Sign in</button>}
       </div>
     </div>
   )
