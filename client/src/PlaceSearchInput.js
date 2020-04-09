@@ -7,6 +7,7 @@ export default function PlaceSearchinput(props) {
         const results = await geocodeByAddress(value);
         const latLng = await getLatLng(results[0]);
         props.setMapCenter(latLng);
+        if(props.setMarkerPositionForPoster)props.setMarkerPositionForPoster(latLng)
         if(props.setAddress)props.setAddress(value);
     };
 

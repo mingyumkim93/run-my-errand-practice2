@@ -33,7 +33,6 @@ function checkAuth(setUser,setIsLoading){
     if (res.data) {
       setUser({ ...res.data });
     }
-    console.log("ASD")
     setIsLoading(false);
   })
 };
