@@ -4,7 +4,7 @@ import WrappedMap from './Map';
 import { Marker, InfoWindow } from 'react-google-maps'
 import axios from 'axios';
 
-export default function Search(props) {
+export default function Search() {
     const [mapCenter, setMapCenter] = useState(undefined);
     const [errands, setErrands] = useState(undefined);
     const [selectedMarker, setSelectedMarker] = useState(undefined);
@@ -14,15 +14,11 @@ export default function Search(props) {
         axios.get("/api/errands").then(res => setErrands(res.data)).catch(err => console.log(err));
     }, [])
 
-    if (!props.isGoogleMapApiReady)
-        return (
-            <div>Loading...</div>
-        )
-
     return (
         <div style={{ margin: "100px" }}>
             <div style={{ height: "50vh", width: "50vh" }}>
                 <WrappedMap
+                    googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLEMAPS_API_KEY}&libraries=geometry,drawing,places`}
                     loadingElement={<div style={{ height: "100%" }} />}
                     containerElement={<div id="map" style={{ height: "100%" }} />}
                     mapElement={<div style={{ height: "100%" }} />}

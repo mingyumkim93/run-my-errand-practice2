@@ -16,18 +16,6 @@ import Search from './Search';
 import Post from './Post';
 import Loading from './Loading';
 
-function loadGoogleMapsScript(setIsGoogleMapApiReady){
-  if(document.getElementById("google-maps-api"))
-  setIsGoogleMapApiReady(true);
-  else {
-    var script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLEMAPS_API_KEY}&libraries=geometry,drawing,places`;
-    script.id = "google-maps-api";
-    script.onload = setIsGoogleMapApiReady(true);
-    document.body.appendChild(script);
-  }
-};
-
 function checkAuth(setUser,setIsLoading){
   axios.get("/api/auth").then((res) => {
     if (res.data) {
@@ -37,15 +25,12 @@ function checkAuth(setUser,setIsLoading){
   })
 };
 
-
 export default function App() {
   
   const [user, setUser] = useState(undefined);
-  const [isGoogleMapApiReady, setIsGoogleMapApiReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadGoogleMapsScript(setIsGoogleMapApiReady);
     checkAuth(setUser,setIsLoading);
   }, []);
 
@@ -62,8 +47,8 @@ export default function App() {
               : <SignIn setUser={setUser}/>
           } />
           <Route path="/signup" component={SignUp} />
-          <Route path="/search" component={()=><Search isGoogleMapApiReady={isGoogleMapApiReady}/>} />
-          <Route path="/post" component={() => <Post user={user} isGoogleMapApiReady={isGoogleMapApiReady} />} />
+          <Route path="/search" component={Search} />
+          <Route path="/post" component={() => <Post user={user}/>} />
         </Switch>
       </Router>
     </div>

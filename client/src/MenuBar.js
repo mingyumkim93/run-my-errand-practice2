@@ -1,5 +1,4 @@
 import React  from 'react';
-//todo change to history
 import history from './history'
 import axios from 'axios';
 
