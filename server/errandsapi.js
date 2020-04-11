@@ -14,4 +14,11 @@ module.exports = function (app) {
             else res.send(data);
         });
     });
+
+    app.get("/api/errand/:id", (req,res) => {
+        errandDao.getErrandById(req.params.id, function(err, data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
 }

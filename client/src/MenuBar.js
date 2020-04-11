@@ -37,6 +37,7 @@ export default function MenuBar(props) {
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px"}}>
         {props.user ? <div onClick={() => {
+          history.push("/")
           props.setUser(undefined);
           axios.get('/api/logout').then((res) => console.log(res))
         }}>Sign out</div> 

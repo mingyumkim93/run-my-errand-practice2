@@ -8,19 +8,24 @@ import axios from 'axios';
 export default function Post(props) {
     
     let markerRef;
-    const HELSINKI_COORDINATES={lat:60.1699, lng:24.9384};
+    const HELSINKI_COORDINATES = {lat:60.1699, lng:24.9384};
     const [mapCenter, setMapCenter] = useState(undefined); 
     const [markerPosition, setMarkerPosition] = useState(undefined);
     const [address, setAddress] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     
+    useEffect(() => {
+        let mounted = true;
+        navigator.geolocation.getCurrentPosition(position => {
+            if (mounted) {
+                setMapCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
+                setMarkerPosition({ lat: position.coords.latitude, lng: position.coords.longitude });
+            }
+        })
+        return () => mounted = false;
+    }, [])
 
-    useEffect(()=>navigator.geolocation.getCurrentPosition(position => {
-        setMapCenter({lat:position.coords.latitude, lng:position.coords.longitude});
-        setMarkerPosition({lat:position.coords.latitude, lng:position.coords.longitude});
-    }),[])
-     
     if(!props.user)
     {
         alert("login is required!")

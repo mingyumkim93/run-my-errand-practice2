@@ -15,11 +15,12 @@ import SignUp from './SignUp';
 import Search from './Search';
 import Post from './Post';
 import Loading from './Loading';
+import ErrandDetail from './ErrandDetail'
 
 function checkAuth(setUser,setIsLoading){
   axios.get("/api/auth").then((res) => {
     if (res.data) {
-      setUser({ ...res.data });
+      setUser(res.data);
     }
     setIsLoading(false);
   })
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/signup" component={SignUp} />
           <Route path="/search" component={Search} />
           <Route path="/post" component={() => <Post user={user}/>} />
+          <Route path="/errand/:id" component={ErrandDetail}/>
         </Switch>
       </Router>
     </div>

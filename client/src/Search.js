@@ -3,11 +3,12 @@ import PlaceSearchInput from './PlaceSearchInput';
 import WrappedMap from './Map';
 import { Marker, InfoWindow } from 'react-google-maps'
 import axios from 'axios';
+import history from './history';
 
 export default function Search() {
     const [mapCenter, setMapCenter] = useState(undefined);
     const [errands, setErrands] = useState(undefined);
-    const [selectedMarker, setSelectedMarker] = useState(undefined);
+    const [selectedErrand, setSelectedErrand] = useState(undefined);
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(position => setMapCenter({ lat: position.coords.latitude, lng: position.coords.longitude }));
@@ -25,9 +26,9 @@ export default function Search() {
                     mapCenter={mapCenter}
                     setMapCenter={setMapCenter}
                 >
-                    {errands && errands.map(errand => <Marker key={errand.id} position={JSON.parse(errand.coordinates)} onClick={() => setSelectedMarker(errand)} />)}
-                    {selectedMarker && <InfoWindow position={JSON.parse(selectedMarker.coordinates)} onCloseClick={() => setSelectedMarker(undefined)}>
-                        <div>{selectedMarker.title}</div>
+                    {errands && errands.map(errand => <Marker key={errand.id} position={JSON.parse(errand.coordinates)} onClick={() => setSelectedErrand(errand)} />)}
+                    {selectedErrand && <InfoWindow position={JSON.parse(selectedErrand.coordinates)} onCloseClick={() => setSelectedErrand(undefined)}>
+                        <div onClick={()=>history.push(`/errand/${selectedErrand.id}`)}>{selectedErrand.title}</div>
                     </InfoWindow>}
                 </WrappedMap>
                 <PlaceSearchInput setMapCenter={setMapCenter} />
