@@ -22,6 +22,7 @@ export default function App() {
   
   const [user, setUser] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const [socket, setSocket] = useState(undefined);
 
   function checkAuth(){
     axios.get("/api/auth").then((res) => {
@@ -34,10 +35,15 @@ export default function App() {
 
   useEffect(() => {
     checkAuth(setUser,setIsLoading);
-    const socket = socketIOClient("http://127.0.0.1:5000");
-    socket.on("test", data => console.log(data));
-    // to send to server, I guess I need to use socket.emit() (socket.on() in server)
+    setSocket(socketIOClient("http://127.0.0.1:5000"));
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      socket.emit("join",`${user.email}`);
+      socket.on("sendOfferMessage", (message) => console.log(message));
+    }
+  }, [user])
 
   if (isLoading) return <div><Loading type={"spokes"} color={"#123123"} /> <h1 style={{ textAlign: "center" }}>Loading...</h1></div> //todo: change to better one
   return (
@@ -52,9 +58,9 @@ export default function App() {
               : <SignIn setUser={setUser}/>
           } />
           <Route path="/signup" component={SignUp} />
-          <Route path="/search" component={Search} />
+          <Route path="/search" component={Search}/>
           <Route path="/post" component={() => <Post user={user}/>} />
-          <Route path="/errand/:id" component={ErrandDetail}/>
+          <Route path="/errand/:id" component={() => <ErrandDetail socket={socket}/>}/>
         </Switch>
       </Router>
     </div>

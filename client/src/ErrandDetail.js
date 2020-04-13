@@ -5,9 +5,9 @@ import axios from 'axios';
 export default function ErrandDetail(props) {
 
     const [ errand, setErrand ] = useState(undefined);
-
+    const { socket } = props
     function fetchErrand(){
-        axios.get(`/api/errand/${props.match.params.id}`).then(res=>{
+        axios.get(`/api${window.location.pathname}`).then(res=>{
            if(res.data.length===0)
                {alert("Not Found!"); history.push("/search")}
             setErrand(res.data[0])}).catch(err=>alert("Something went wrong!", err));
@@ -27,6 +27,7 @@ export default function ErrandDetail(props) {
             <div>{errand.id}</div>
             <div>{errand.title}</div>
             <div>{errand.description}</div>
+            <button onClick={() => props.socket.emit("sendOffer",{ message:"This is offer test", errand})}>Socket test</button>
         </div>
     )
 }

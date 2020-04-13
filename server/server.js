@@ -17,14 +17,12 @@ errandsApi(app);
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));
 const io = require('socket.io').listen(server);
-
 io.on("connection", socket => {
     console.log("New client connected", socket.id);
-    socketTest(socket);
     socket.on("disconnect", ()=>console.log("Client disconnected: ", socket.id));
-    socket.on("error", ()=>console.log("Recieved error from client: ", socket.id))
+    socket.on("error", ()=>console.log("Recieved error from client: ", socket.id));
+    socket.on("join",(email)=> socket.join(email));
+    socket.on("sendOffer", ({message, errand}) => {
+        socket.broadcast.to(`${errand.poster}`).emit("sendOfferMessage", {message})
+    });
 });
-
-const socketTest = (socket) =>{
-    socket.emit("test", "this is test function");
-}

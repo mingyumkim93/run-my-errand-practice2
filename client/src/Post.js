@@ -14,6 +14,7 @@ export default function Post(props) {
     const [address, setAddress] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+     
     
     useEffect(() => {
         let mounted = true;
@@ -52,7 +53,8 @@ export default function Post(props) {
             <button onClick={()=>axios.post("/api/errands", {title,
                                                              description,
                                                              address, 
-                                                             coordinates:JSON.stringify(markerPosition)})
+                                                             coordinates:JSON.stringify(markerPosition),
+                                                             poster:props.user.email},)
                                                              .then((res)=>console.log(res)).catch((err)=>console.log(err))
                                                              }>Create New Errand</button>
         </div>
