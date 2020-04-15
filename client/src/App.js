@@ -8,6 +8,7 @@ import {
 import history from './history';
 import axios from 'axios';
 
+import MessageTestPage from './MessageTestPage'
 import MenuBar from './MenuBar';
 import Main from './Main';
 import SignIn from './SignIn';
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/search" component={Search}/>
           <Route path="/post" component={() => <Post user={user}/>} />
           <Route path="/errand/:id" component={() => <ErrandDetail socket={socket}/>}/>
+          <Route path="/messagepage" component={() => <MessageTestPage user={user} socket={socket}/>}/>
         </Switch>
       </Router>
     </div>

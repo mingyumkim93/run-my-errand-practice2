@@ -27,7 +27,7 @@ export default function ErrandDetail(props) {
             <div>{errand.id}</div>
             <div>{errand.title}</div>
             <div>{errand.description}</div>
-            <button onClick={() => props.socket.emit("sendOffer",{ message:"This is offer test", errand})}>Socket test</button>
+            <button onClick={() => socket.emit("sendOffer",{ message:"This is offer test", errand})}>Socket test</button>
         </div>
     )
 }
