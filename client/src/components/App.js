@@ -1,32 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Router,
   Switch,
   Route,
   Redirect
 } from "react-router-dom";
-import history from './history';
-import axios from 'axios';
 
-import MessageTestPage from './MessageTestPage'
-import MenuBar from './MenuBar';
-import Main from './Main';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
-import Search from './Search';
-import Post from './Post';
-import Loading from './Loading';
-import ErrandDetail from './ErrandDetail'
-import socketIOClient from 'socket.io-client';
+import history from "../history";
+import API from "../utils/API";
+
+import MenuBar from "./MenuBar";
+import Main from "../pages/Main";
+import Loading from "../Loading";
+
+import SignIn from "../pages/SignIn";
+import SignUp from "../pages/SignUp";
+import Search from "../pages/Search";
+import Post from "../pages/Post";
+import ErrandDetail from "../pages/ErrandDetail";
 
 export default function App() {
   
-  const [user, setUser] = useState(undefined);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [socket, setSocket] = useState(undefined);
 
   function checkAuth(){
-    axios.get("/api/auth").then((res) => {
+    API.auth.check().then((res) => {
       if (res.data) {
         setUser(res.data);
       }
@@ -36,15 +35,7 @@ export default function App() {
 
   useEffect(() => {
     checkAuth(setUser,setIsLoading);
-    setSocket(socketIOClient("http://127.0.0.1:5000"));
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      socket.emit("join",`${user.email}`);
-      socket.on("sendOfferMessage", (message) => console.log(message));
-    }
-  }, [user])
 
   if (isLoading) return <div><Loading type={"spokes"} color={"#123123"} /> <h1 style={{ textAlign: "center" }}>Loading...</h1></div> //todo: change to better one
   return (
@@ -61,11 +52,10 @@ export default function App() {
           <Route path="/signup" component={SignUp} />
           <Route path="/search" component={Search}/>
           <Route path="/post" component={() => <Post user={user}/>} />
-          <Route path="/errand/:id" component={() => <ErrandDetail socket={socket}/>}/>
-          <Route path="/messagepage" component={() => <MessageTestPage user={user} socket={socket}/>}/>
+          <Route path="/errand/:id" component={ErrandDetail}/>
         </Switch>
       </Router>
     </div>
   );
-}
+};
 

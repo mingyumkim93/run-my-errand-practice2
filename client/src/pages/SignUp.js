@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import axios from 'axios';
-import history from './history';
+import React, { useState } from "react";
+import API from "../utils/API";
+import history from "../history";
 
 export default function SignUp() {
 
@@ -15,7 +15,7 @@ export default function SignUp() {
         }
         alert("You have entered an invalid email address!")
         return (false)
-    }
+    };
     
     return(
         <div>
@@ -25,10 +25,9 @@ export default function SignUp() {
             <input placeholder="Last Name" onChange={(e)=>setLastName(e.target.value)}></input>
             <button onClick={()=>{
                 if(validationEmail(email))
-                axios.post("/api/user",{email,password, firstName, lastName, authMethod:'internal'}).then((res)=>console.log(res));
-                history.push('/');
+                API.auth.signUp({email,password, firstName, lastName, authMethod:"internal"}).then((res)=>console.log(res));
+                history.push("/");
                 }}>Sign up</button>
         </div>
-    )
-
-}
+    );
+};

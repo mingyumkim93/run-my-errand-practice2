@@ -2,11 +2,11 @@ const mysql = require("mysql");
 
 const mysqlConn = mysql.createConnection({
     protocol: "mysql",
-    host: 'localhost',
+    host: "localhost",
     port: 3306,
     user: "dbuser",
     password: "Daylight12!",
-    database: 'crm'
+    database: "crm"
 });
 
 module.exports = mysqlConn;

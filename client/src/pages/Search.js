@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import PlaceSearchInput from './PlaceSearchInput';
-import WrappedMap from './Map';
-import { Marker, InfoWindow } from 'react-google-maps'
-import axios from 'axios';
-import history from './history';
+import React, { useState, useEffect } from "react";
+import { Marker, InfoWindow } from "react-google-maps"
+import API from "../utils/API";
+import history from "../history";
+import PlaceSearchInput from "../components/PlaceSearchInput";
+import WrappedMap from "../components/Map";
 
 export default function Search() {
-    const [mapCenter, setMapCenter] = useState(undefined);
-    const [errands, setErrands] = useState(undefined);
-    const [selectedErrand, setSelectedErrand] = useState(undefined);
+    const [mapCenter, setMapCenter] = useState(null);
+    const [errands, setErrands] = useState(null);
+    const [selectedErrand, setSelectedErrand] = useState(null);
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(position => setMapCenter({ lat: position.coords.latitude, lng: position.coords.longitude }));
-        axios.get("/api/errands").then(res => setErrands(res.data)).catch(err => console.log(err));
-    }, [])
+        API.errand.fetchAllErrands().then(res => setErrands(res.data)).catch(err => console.log(err));
+    }, []);
 
     return (
         <div style={{ margin: "100px" }}>
@@ -34,5 +34,5 @@ export default function Search() {
                 <PlaceSearchInput setMapCenter={setMapCenter} />
             </div>
         </div>
-    )
-}
+    );
+};

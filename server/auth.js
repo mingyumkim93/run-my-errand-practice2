@@ -1,15 +1,15 @@
-const session = require('express-session');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const GoogleStrategy = require('passport-google-oauth2');
-const userDao = require('./userdao');
-const bcrypt = require('bcrypt');
-require('dotenv').config();
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const GoogleStrategy = require("passport-google-oauth2");
+const userDao = require("./userdao");
+const bcrypt = require("bcrypt");
+require("dotenv").config();
 
 module.exports = function (app) {
     app.use(session({
         //TODO: change secret later and hide it.
-        secret: 'change later',
+        secret: "change later",
         resave: false,
         saveUninitialized: false
     }));
@@ -29,7 +29,7 @@ module.exports = function (app) {
         });
     });
 
-    passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, function (email, password, done) {
+    passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, function (email, password, done) {
         userDao.getUserByEmail(email, function (err, data) {
             const user = data[0];
             if (err) return done(err);
@@ -62,12 +62,11 @@ module.exports = function (app) {
         })
     }));
 
-    app.get('/auth/google', passport.authenticate('google', {
-        scope: ['profile', 'email'],
+    app.get("/auth/google", passport.authenticate("google", {
+        scope: ["profile", "email"],
     }));
 
-    app.get("/api/test", (req, res) => {userDao.getUserByEmail(req.body.email,(err,data)=>{console.log(data)}); res.send("????????????????????")});
-    app.get("/api/auth", (req, res) => {
+    app.get("/auth/check", (req, res) => {
         if (req.user) {
             delete req.user.password;
             res.send(req.user);
@@ -75,21 +74,21 @@ module.exports = function (app) {
         else res.send(false);
     });
 
-    app.get('/auth/google/redirect', passport.authenticate('google', {
+    app.get("/auth/google/redirect", passport.authenticate("google", {
         successRedirect: "http://localhost:3000",
         failureRedirect: "/auth/login/failed"
     }));
 
-    app.post('/login', passport.authenticate('local', { failureRedirect: '/login/fail' }), function (req, res) {
+    app.post("/auth/login", passport.authenticate("local", { failureRedirect: "/login/fail" }), function (req, res) {
         //if authentication was successful, this function will get called.
         delete req.user.password;
         res.status(200);
         res.send(req.user);
     });
 
-    app.get('/api/logout', (req,res) => {req.logout(); res.send("Logout!!")})
+    app.get("/auth/logout", (req,res) => {req.logout(); res.send("Logout!!")})
 
-    app.get('/login/fail', function (_, res) {
+    app.get("/login/fail", function (_, res) {
         res.sendStatus(401);
     });
 }

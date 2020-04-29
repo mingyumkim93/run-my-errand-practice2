@@ -16,7 +16,7 @@ async function hashPassword(req, res) {
 };
 
 module.exports = function (app) {
-        app.post("/api/user", (req, res) => {
+        app.post("/auth/signup", (req, res) => {
             userDao.getUserByEmail(req.body.email, function(err, data){
                 if(err) res.send(err);
                 if(data[0]) res.send(404);
@@ -32,4 +32,4 @@ module.exports = function (app) {
                 }
             });
         });
-}
+};

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import { geocodeByAddress, getLatLng } from "react-places-autocomplete";
 
 export default function PlaceSearchinput(props) {
@@ -13,6 +13,6 @@ export default function PlaceSearchinput(props) {
 
     return (
     <input placeholder="Enter full address" onChange={(e)=>setAddressInput(e.target.value)} onBlur={()=>handleSelect(addressInput)} onKeyDown={(e)=>{if(e.key==="Enter")e.target.blur()}}/>
-    )
+    );
     
-}
+};
