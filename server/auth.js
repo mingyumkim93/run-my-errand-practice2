@@ -4,6 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth2");
 const userDao = require("./userdao");
 const bcrypt = require("bcrypt");
+const { uuid } = require("uuidv4");
 require("dotenv").config();
 
 module.exports = function (app) {
@@ -49,14 +50,14 @@ module.exports = function (app) {
             email: profile.email,
             firstname: profile.given_name,
             lastname: profile.family_name,
-            authMethod: profile.provider
+            authMethod: profile.provider,
+            createdAt: new Date(),
+            id: uuid()
         };
 
         userDao.getUserByEmail(profile.email, function (error, data) {
             if (data[0]) {delete data[0].password; done(null, data[0]);}
             else userDao.createNewUser(user, function (error, data) {
-                user = { ...user, id: data.insertId }
-                console.log(user);
                 done(null, user);
             });
         })

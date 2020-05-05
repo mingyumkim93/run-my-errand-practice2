@@ -51,12 +51,13 @@ export default function Post(props) {
                </WrappedMap>
             </div>
             <button onClick={()=>API.errand.postErrand({title,
-                                                             description,
-                                                             address, 
-                                                             coordinates:JSON.stringify(markerPosition),
-                                                             poster:props.user.email})
-                                                             .then((res)=>console.log(res)).catch((err)=>console.log(err))
-                                                             }>Create New Errand</button>
+                                                        description,
+                                                        address, 
+                                                        coordinates:JSON.stringify(markerPosition),
+                                                        poster:props.user.id
+                                                    })
+                                                        .then((res)=>console.log(res)).catch((err)=>console.log(err))
+                                                        }>Create New Errand</button>
         </div>
     );
 };

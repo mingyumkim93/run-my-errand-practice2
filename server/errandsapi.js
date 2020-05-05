@@ -2,6 +2,7 @@ const errandDao = require("./errandsdao");
 
 module.exports = function (app) {
     app.post("/errand/post", (req, res) => {
+        req.body.createdAt = new Date();
         errandDao.createNewErrand(req.body, function(err,data){
             if(err) res.send(err);
             else res.send(data);

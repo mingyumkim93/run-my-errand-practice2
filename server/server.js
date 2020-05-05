@@ -25,10 +25,6 @@ io.on("connection", socket => {
     socket.on("disconnect", ()=>console.log("Client disconnected: ", socket.id));
     socket.on("error", ()=>console.log("Recieved error from client: ", socket.id));
     socket.on("join",(id)=> socket.join(id));
-    socket.on("message", (message) => {
-        message = {...message, createdAt : new Date()};
-        socket.broadcast.to(`${message.receiver}`).emit("message",message);
-    })
 });
 
 // test 

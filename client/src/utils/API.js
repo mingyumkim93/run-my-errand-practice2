@@ -13,6 +13,9 @@ export default {
         },
         check(){
             return axios.get("/auth/check");
+        },
+        getFullNameById(payload){
+            return axios.get("/auth/getFullNameById", {params : {id: payload}});
         }
     },
     errand:{
@@ -20,10 +23,18 @@ export default {
             return axios.post("/errand/post", payload);
         },
         fetchAllErrands(){
-            return axios.get("/errand/fetch-all")
+            return axios.get("/errand/fetch-all");
         },
         fetchAErrand(payload){
             return axios.get(payload);
+        }
+    },
+    message:{
+        fetchMessages(payload){
+            return axios.get("/message/fetch-all", {params: {id: payload}});
+        },
+        createdMessage(payload){
+            return axios.post("/message/create", payload);
         }
     }
 }

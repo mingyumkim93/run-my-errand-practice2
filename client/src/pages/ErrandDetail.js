@@ -13,8 +13,9 @@ export default function ErrandDetail() {
     };
     
     useEffect(() => {
-            fetchErrand();
+        fetchErrand();
     },[]);
+
 
     if (!errand) return( <div> loading...</div>);
     return (
@@ -24,6 +25,7 @@ export default function ErrandDetail() {
             <div>{errand.title}</div>
             <div>{errand.description}</div>
             {/* prevent user change url to whatever number && only authenticated user can send message */}
+            <div onClick={()=>history.push(`/message/${errand.poster}`)}>Contact host</div>
         </div>
     );
 };

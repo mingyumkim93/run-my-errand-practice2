@@ -33,6 +33,8 @@ export default function MenuBar(props) {
           <div>item C</div>
         </div>
       </div>
+      {props.user ? <div onClick={()=>history.push("/Inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message</div> :
+        <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       {props.user ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {props.user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px"}}>

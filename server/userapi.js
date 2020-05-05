@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const userDao = require("./userdao");
+const { uuid } = require("uuidv4");
 
 async function hashPassword(req, res) {
     const saltRounds = 10;
@@ -23,6 +24,8 @@ module.exports = function (app) {
                 else{ //there is no same existing email in db
                     hashPassword(req, res).then(hashedPassword=>{
                         req.body.password = hashedPassword;
+                        req.body.createdAt = new Date();
+                        req.body.id = uuid();
                         userDao.createNewUser(req.body, function(err,user){
                             // find a better way to handle this duplicated code
                             if(err) res.send(err);
@@ -30,6 +33,13 @@ module.exports = function (app) {
                         });
                     });
                 }
+            });
+        });
+
+        app.get("/auth/getFullNameById", (req, res) => {
+            userDao.getUserById(req.query.id, function(err, data){
+                if(err) res.send(err);
+                else {res.send(data)}
             });
         });
 };
