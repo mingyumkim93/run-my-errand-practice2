@@ -1,40 +1,46 @@
 import axios from 'axios';
 
 export default {
-    auth:{
-        signUp(payload){
+    auth: {
+        signUp(payload) {
             return axios.post("/auth/signup", payload);
         },
-        login(payload){
+        login(payload) {
             return axios.post("/auth/login", payload);
         },
-        logout(){
+        logout() {
             return axios.get("/auth/logout");
         },
-        check(){
+        check() {
             return axios.get("/auth/check");
         },
-        getFullNameById(payload){
-            return axios.get("/auth/getFullNameById", {params : {id: payload}});
+        getFullNameById(payload) {
+            return axios.get("/auth/getFullNameById", { params: { id: payload } });
         }
     },
-    errand:{
-        postErrand(payload){
+    errand: {
+        postErrand(payload) {
             return axios.post("/errand/post", payload);
         },
-        fetchAllErrands(){
+        fetchAllErrands() {
             return axios.get("/errand/fetch-all");
         },
-        fetchAErrand(payload){
+        fetchAErrand(payload) {
             return axios.get(payload);
         }
     },
-    message:{
-        fetchMessages(payload){
-            return axios.get("/message/fetch-all", {params: {id: payload}});
+    message: {
+        fetchAllMessages(payload) {
+            return axios.get("/message/fetch-all", { params: { id: payload } });
         },
-        createdMessage(payload){
+        createdMessage(payload) {
             return axios.post("/message/create", payload);
+        },
+        fetchMessagesWithUser(payload) {
+            return axios.get(payload);
+        },
+        markMessagesAsRead(user, other) {
+            return axios.get("/message/read", { params: { user, other } });
         }
     }
 }
