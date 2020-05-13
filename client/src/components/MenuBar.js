@@ -1,8 +1,6 @@
 import React from "react";
 import history from "../history";
-import API from "../utils/API";
 import { connect } from "react-redux";
-import { actionCreators } from "../store";
 
 function MenuBar({user, signOut}) {
 

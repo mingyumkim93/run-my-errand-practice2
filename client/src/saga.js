@@ -1,5 +1,6 @@
 import { takeLatest, put } from "redux-saga/effects";
 import { actionCreators } from "./store";
+import history from "./history";
 import API from "./utils/API";
 
 function* authCheck(){
@@ -19,6 +20,7 @@ function* signIn(action){
        const res = yield API.auth.login(action.payload);
        const data = res.data;
        yield put(actionCreators.signIn(data));
+       yield history.push("/");
    }
    catch(err){
     alert("Somthing went wrong on signing in");
@@ -28,8 +30,10 @@ function* signIn(action){
 function* signOut(){
     try{
         const res = yield API.auth.logout();
-        if(res.status === 200)
+        if(res.status === 200){
             yield put(actionCreators.signOut());
+            yield history.push("/");
+        }
     }
     catch(err){
      alert("Somthing went wrong on signing out");

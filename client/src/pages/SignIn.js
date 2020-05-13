@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import API from "../utils/API";
 import history from "../history";
 import { connect } from "react-redux";
 

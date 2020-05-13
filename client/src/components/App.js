@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Router,
   Switch,
@@ -6,13 +6,10 @@ import {
 } from "react-router-dom";
 
 import history from "../history";
-import API from "../utils/API";
 import socket from "../utils/socket";
 import { connect } from "react-redux";
-import { actionCreators } from "../store";
 
 import MenuBar from "./MenuBar";
-import Loading from "../Loading";
 
 import Main from "../pages/Main";
 import SignIn from "../pages/SignIn";
@@ -25,25 +22,7 @@ import Message from "../pages/Message";
 
 function App({authCheck}) {
 
-  // const [user, setUser] = useState(null);
-  // const [rawMessages, setRawMessages] = useState(null);
-  // const [sortedMessages, setSortedMessages] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  // const [numberOfUnreadMessages, setNumberOfUnreadMessages] = useState(0);
-
-
   useEffect(() => {
-    // function checkAuth() {
-    //   console.log("check auth in App")
-    //   API.auth.check().then((res) => {
-    //     if (res.data) {
-    //       console.log("in app",res.data);
-    //       signIn(res.data);
-    //     }
-    //     setIsLoading(false);
-    //   });
-    // };
-    // checkAuth();
     authCheck();
   }, []);
 
