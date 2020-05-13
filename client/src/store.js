@@ -1,18 +1,18 @@
 import { createAction, createReducer, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
-import { watchSignIn } from "./saga";
+import { watchMany } from "./saga";
 
 const sagaMiddleware = createSagaMiddleware();
-const middleware = [...getDefaultMiddleware(), sagaMiddleware]
+const middleware = [...getDefaultMiddleware(), sagaMiddleware];
 
 const initialState = {
     user: [],
     errands: [],
     messages: []
-}
+};
 
-const authCheck = createAction("AUTH_CHECK_ASYNC");
-const signIn = createAction("SIGN_IN_ASYNC");
+const authCheck = createAction("AUTH_CHECK");
+const signIn = createAction("SIGN_IN");
 const signOut = createAction("SIGN_OUT");
 
 const reducer = createReducer(initialState, {
@@ -29,6 +29,6 @@ export const actionCreators = {
 };
 
 const store = configureStore({ reducer,  middleware});
-sagaMiddleware.run(watchSignIn);
+sagaMiddleware.run(watchMany);
 
 export default store;

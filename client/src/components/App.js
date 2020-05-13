@@ -133,7 +133,7 @@ function App({authCheck}) {
 
 function mapDispatchToProps(dispatch){
   return{
-    authCheck: () =>dispatch({type: "AUTH_CHECK"})
+    authCheck: () =>dispatch({type: "AUTH_CHECK_ASYNC"})
   }
 };
 

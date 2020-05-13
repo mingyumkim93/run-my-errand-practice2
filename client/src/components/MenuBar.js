@@ -39,12 +39,7 @@ function MenuBar({user, signOut}) {
       {user.length !==0 ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px" }}>
-        {user.length !==0 ? <div onClick={() => {
-          API.auth.logout().then((res) => {
-            signOut();
-            history.push("/");
-          }).catch((err)=>alert("Something went wrong when you sign out."));
-        }}>Sign out</div>
+        {user.length !==0 ? <div onClick={() => signOut()}>Sign out</div>
           : <button onClick={() => history.push("/signin")}>Sign in</button>}
       </div>
     </div>
@@ -59,7 +54,7 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
   return {
-    signOut: () => dispatch(actionCreators.signOut())
+    signOut: () => dispatch({type: "SIGN_OUT_ASYNC"})
   }
 };
 
