@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import API from "../utils/API";
 import history from "../history";
+import { connect } from "react-redux";
+import { actionCreators } from "../store";
 
-export default function SignIn(props) {
+function SignIn({signIn}) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -13,9 +15,8 @@ export default function SignIn(props) {
             <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)}></input>
             <button onClick={() => API.auth.login({ email, password }).then((res) => {
                 if(res.status ===200 ){
-                    let user = res.data;
-                    props.setUser(user);
-                    history.push("/")}}).catch(err => console.log("err"))}>Sign in</button>
+                    signIn(res.data);
+                    history.push("/")}}).catch(err => alert(err, "Failed to login!"))}>Sign in</button>
             <button onClick={() => {
                 window.open("http://localhost:5000/auth/google", "_self");
             }}>login with google</button>
@@ -23,3 +24,11 @@ export default function SignIn(props) {
         </div>
     );
 };
+
+function mapDispatchToProps(dispatch){
+    return{
+        signIn: (user) => dispatch(actionCreators.signIn(user))
+    }
+};
+
+export default connect(null, mapDispatchToProps)(SignIn);

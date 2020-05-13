@@ -4,8 +4,9 @@ import { Marker } from "react-google-maps";
 import API from "../utils/API";
 import PlaceSearchInput from "../components/PlaceSearchInput";
 import WrappedMap from "../components/Map";
+import { connect } from "react-redux";
 
-export default function Post(props) {
+function Post({user}) {
     
     let markerRef;
     const HELSINKI_COORDINATES = {lat:60.1699, lng:24.9384};
@@ -27,7 +28,7 @@ export default function Post(props) {
         return () => mounted = false;
     }, []);
 
-    if(!props.user)
+    if(user.length === 0)
     {
         alert("login is required!")
         return <Redirect to="/signin"/>
@@ -54,10 +55,18 @@ export default function Post(props) {
                                                         description,
                                                         address, 
                                                         coordinates:JSON.stringify(markerPosition),
-                                                        poster:props.user.id
+                                                        poster:user[0].id
                                                     })
                                                         .then((res)=>console.log(res)).catch((err)=>console.log(err))
                                                         }>Create New Errand</button>
         </div>
     );
 };
+
+function mapStateToProps(state){
+    return{
+        user:state.user
+    }
+};
+
+export default connect(mapStateToProps)(Post);

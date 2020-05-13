@@ -1,8 +1,10 @@
 import React from "react";
 import history from "../history";
 import API from "../utils/API";
+import { connect } from "react-redux";
+import { actionCreators } from "../store";
 
-export default function MenuBar(props) {
+function MenuBar({user, signOut}) {
 
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector("div").style.display = ""
@@ -32,18 +34,33 @@ export default function MenuBar(props) {
           <div>item C</div>
         </div>
       </div>
-      {props.user ? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{props.numberOfUnreadMessages}</div> :
+      {user.length !==0 ? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
-      {props.user ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {props.user.firstname}</div> :
+      {user.length !==0 ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px" }}>
-        {props.user ? <div onClick={() => {
-          history.push("/")
-          props.setUser(undefined);
-          API.auth.logout().then((res) => console.log(res))
+        {user.length !==0 ? <div onClick={() => {
+          API.auth.logout().then((res) => {
+            signOut();
+            history.push("/");
+          }).catch((err)=>alert("Something went wrong when you sign out."));
         }}>Sign out</div>
           : <button onClick={() => history.push("/signin")}>Sign in</button>}
       </div>
     </div>
   );
 };
+
+function mapStateToProps(state){
+  return {
+    user : state.user
+  }
+};
+
+function mapDispatchToProps(dispatch){
+  return {
+    signOut: () => dispatch(actionCreators.signOut())
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MenuBar);
