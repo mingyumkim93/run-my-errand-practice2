@@ -22,9 +22,10 @@ import Message from "../pages/Message";
 
 function App({authCheck}) {
 
+  //should it go into menubar?
   useEffect(() => {
     authCheck();
-  }, []);
+  }, [authCheck]);
 
   // useEffect(() => {
   //   // if user loged in

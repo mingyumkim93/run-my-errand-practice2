@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Marker, InfoWindow } from "react-google-maps"
-import API from "../utils/API";
+import API from "../utils/api";
 import history from "../history";
 import PlaceSearchInput from "../components/PlaceSearchInput";
 import WrappedMap from "../components/Map";

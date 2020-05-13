@@ -2,7 +2,7 @@ import React from "react";
 import history from "../history";
 import { connect } from "react-redux";
 
-function MenuBar({user, signOut}) {
+function MenuBar({user, signOut, messages}) {
 
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector("div").style.display = ""
@@ -32,12 +32,12 @@ function MenuBar({user, signOut}) {
           <div>item C</div>
         </div>
       </div>
-      {user.length !==0 ? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{}</div> :
+      {messages? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{messages.length}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
-      {user.length !==0 ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
+      {user? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px" }}>
-        {user.length !==0 ? <div onClick={() => signOut()}>Sign out</div>
+        {user? <div onClick={() => signOut()}>Sign out</div>
           : <button onClick={() => history.push("/signin")}>Sign in</button>}
       </div>
     </div>
@@ -46,7 +46,8 @@ function MenuBar({user, signOut}) {
 
 function mapStateToProps(state){
   return {
-    user : state.user
+    user : state.user,
+    messages : state.messages
   }
 };
 

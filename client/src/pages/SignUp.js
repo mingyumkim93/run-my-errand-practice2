@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import API from "../utils/API";
+import API from "../utils/api";
 import history from "../history";
 
 export default function SignUp() {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import history from "../history";
-import API from "../utils/API";
+import API from "../utils/api";
 
 export default function Inbox(props) {
     // get messages via props and sort and render them

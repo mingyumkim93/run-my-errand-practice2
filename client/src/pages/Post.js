@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import { Marker } from "react-google-maps";
-import API from "../utils/API";
+import API from "../utils/api";
 import PlaceSearchInput from "../components/PlaceSearchInput";
 import WrappedMap from "../components/Map";
 import { connect } from "react-redux";

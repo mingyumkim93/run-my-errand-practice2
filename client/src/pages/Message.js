@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../utils/API";
+import API from "../utils/api";
 import socket from "../utils/socket";
 
 export default function Message(props) {
