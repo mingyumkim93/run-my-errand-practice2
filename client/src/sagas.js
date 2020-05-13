@@ -19,7 +19,7 @@ function* signIn(action){
    try{
        const res = yield call(api.auth.login, action.payload);
        const data = res.data;
-       yield put(actionCreators.signIn(data));
+       yield all([put(actionCreators.signIn(data)), put({type:"FETCH_MESSAGES_ASYNC", payload:{id:data.id}})]);
        yield history.push("/");
    }
    catch(err){
@@ -31,7 +31,7 @@ function* signOut(){
     try{
         const res = yield call(api.auth.logout);
         if(res.status === 200){
-            yield put(actionCreators.signOut());
+            yield all([put(actionCreators.signOut()), put(actionCreators.emptyMessages())]);
             yield history.push("/");
         }
     }
