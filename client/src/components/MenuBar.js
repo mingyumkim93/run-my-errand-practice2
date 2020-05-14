@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import history from "../history";
 import { connect } from "react-redux";
+import socket from "../utils/socket";
+import { actionCreators } from "../store";
 
-function MenuBar({user, signOut, messages, authCheck}) {
-
+function MenuBar({ user, signOut, messages, authCheck, addMessage }) {
 
   const [unreadMessages, setUnreadMessages] = useState(null);
 
@@ -22,6 +23,14 @@ function MenuBar({user, signOut, messages, authCheck}) {
       countUnreadMessages()
     }
   }, [messages, user]);
+
+  useEffect(() => {
+    if (user && addMessage) {
+      socket.emit("join", user.id);
+      socket.on("message", (message) => addMessage(message[0]));
+      socket.on("message-error", () => { alert("something went wrong with message") });
+    }
+  }, [user, addMessage])
 
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector("div").style.display = ""
@@ -51,29 +60,30 @@ function MenuBar({user, signOut, messages, authCheck}) {
           <div>item C</div>
         </div>
       </div>
-  {unreadMessages? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{unreadMessages.length}</div> :
+      {unreadMessages ? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{unreadMessages.length}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
-      {user? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
+      {user ? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       <div style={{ flexBasis: "100px" }}>
-        {user? <div onClick={() => signOut()}>Sign out</div>
+        {user ? <div onClick={() => signOut()}>Sign out</div>
           : <button onClick={() => history.push("/signin")}>Sign in</button>}
       </div>
     </div>
   );
 };
 
-function mapStateToProps(state){
+function mapStateToProps(state) {
   return {
-    user : state.user,
-    messages : state.messages
+    user: state.user,
+    messages: state.messages
   }
 };
 
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
   return {
-    signOut: () => dispatch({type: "SIGN_OUT_ASYNC"}),
-    authCheck: () =>dispatch({type: "AUTH_CHECK_ASYNC"})
+    signOut: () => dispatch({ type: "SIGN_OUT_ASYNC" }),
+    authCheck: () => dispatch({ type: "AUTH_CHECK_ASYNC" }),
+    addMessage: (message) => dispatch(actionCreators.addMessage(message))
   }
 };
 

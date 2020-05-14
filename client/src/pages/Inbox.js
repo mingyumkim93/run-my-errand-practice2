@@ -6,7 +6,7 @@ import api from "../utils/api";
 function Inbox({messages, user}) {
 
     const [idNameTable, setIdNameTable] = useState(null);
-    const [ sortedMessages, setSortedMessages] = useState(null);
+    const [sortedMessages, setSortedMessages] = useState(null);
     useEffect(()=>{
         if(messages && user){
             let sortedMessages = {};

@@ -18,15 +18,20 @@ const signOut = createAction("SIGN_OUT");
 const fetchMessages = createAction("FETCH_MESSAGES");
 const emptyMessages = createAction("EMPTY_MESSAGES");
 const readMessages = createAction("READ_MESSAGES");
+const addMessage = createAction("ADD_MESSAGE");
 
 const reducer = createReducer(initialState, {
     // it's ok to mutate state here because toolkit works with Immer
+    // from sagas
     [signIn]: (state, action) => { state.user = action.payload },
     [signOut]: (state, action) => { state.user = null },
     [authCheck]: (state, action) => { state.user = action.payload },
-    [fetchMessages]: (state, action) => { state.messages = action.payload},
-    [emptyMessages]: (state, action) => { state.messages = null},
-    [readMessages]: (state, action) => {state.messages = action.payload}
+    [fetchMessages]: (state, action) => { state.messages = action.payload },
+    [emptyMessages]: (state, action) => { state.messages = null },
+    [readMessages]: (state, action) => { state.messages = action.payload },
+
+    // none sagas
+    [addMessage]: (state, action) => { state.messages.push(action.payload) }
 });
 
 export const actionCreators = {
@@ -34,10 +39,12 @@ export const actionCreators = {
     signIn,
     signOut,
     fetchMessages,
-    emptyMessages
+    emptyMessages,
+    readMessages,
+    addMessage
 };
 
-const store = configureStore({ reducer,  middleware});
+const store = configureStore({ reducer, middleware });
 sagaMiddleware.run(watchMany);
 
 export default store;

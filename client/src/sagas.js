@@ -63,14 +63,13 @@ function* readMessages(action) {
                 else
                     return message
             });
-            yield put({ type: "READ_MESSAGES", payload: updatedMessages });
+            yield put(actionCreators.readMessages(updatedMessages));
         }
     }
     catch (err) {
         alert("something went wrong on marking messages as read")
     }
-
-}
+};
 
 export function* watchMany() {
     yield takeLatest("AUTH_CHECK_ASYNC", authCheck);
