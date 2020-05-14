@@ -1,51 +1,28 @@
 import React, { useState, useEffect } from "react";
-import API from "../utils/api";
+import api from "../utils/api";
 import socket from "../utils/socket";
+import { connect } from "react-redux";
 
-export default function Message(props) {
+function Message({user, readMessages}) {
 
-    //change so that messages are from props not from the server
     const [messageInput, setMessageInput] = useState("");
     const [messagesWithUser, setMessagesWithUser] = useState(null);
     useEffect(() => {
-        console.log(props)
-        if (props.sortedMessages) {
-            console.log("set message with this user in message")
-            setMessagesWithUser(props.sortedMessages[window.location.pathname.split("/")[2]]);
-        }
-    }, []);
-
-    useEffect(()=>{
-        console.log("laskjdqwkljdqwkuhkuqwhdqwkuhk")
-    }, [props.sortedMessages])
+        if(user){
+            api.message.fetchMessagesWithUser(window.location.pathname.split("/")[2])
+            .then(res=>setMessagesWithUser(res.data))
+            .catch(err => console.log(err));
+        };
+    }, [user]);
 
     useEffect(() => {
-        if (messagesWithUser) {
-            console.log("mark messages with this user as read in message")
-            API.message.markMessagesAsRead(props.user.id, window.location.pathname.split("/")[2]).then(res => {
-                if (res.data === "succeed") {
-                    // const messagesAfterRead = messagesWithUser.map((message) => {
-                    //     if(message.receiver === props.user.id){
-                    //         return message = {...message, isRead:1};
-                    //     }
-                    //     return message
-                    // });
-                    // const updatedMessagesState = props.sortedMessages;
-                    // updatedMessagesState[window.location.pathname.split("/")[2]] = messagesAfterRead;
-                    const readStateUpdatedMessages = props.rawMessages.map((message) => {
-                        if (message.receiver === props.user.id && message.sender === window.location.pathname.split("/")[2])
-                            return message = { ...message, isRead: 1 }
-                        return message
-                    });
-                    if (JSON.stringify(readStateUpdatedMessages) !== JSON.stringify(props.rawMessages))
-                        props.setRawMessages(readStateUpdatedMessages);
-                }
-            }).catch(err => alert("there was error on changing messages read state"));
-        }
-    }, [messagesWithUser])
+        if (messagesWithUser && user && readMessages) {
+            readMessages(user.id ,window.location.pathname.split("/")[2])
+    }
+    }, [messagesWithUser, user, readMessages])
 
     function sendMessage() {
-        socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: props.user.id });
+        // socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: props.user.id });
         setMessageInput("");
     };
 
@@ -58,4 +35,18 @@ export default function Message(props) {
             <button onClick={sendMessage}>Send</button>
         </div>
     )
-}
+};
+
+function mapStateToProps(state){
+    return{
+        user:state.user
+    };
+};
+
+function mapDispatchToProps(dispatch){
+    return{
+        readMessages : (id, othersId) => dispatch({type:"READ_MESSAGES_ASYNC", id, othersId})
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Message);

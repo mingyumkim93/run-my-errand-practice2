@@ -1,8 +1,27 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import history from "../history";
 import { connect } from "react-redux";
 
-function MenuBar({user, signOut, messages}) {
+function MenuBar({user, signOut, messages, authCheck}) {
+
+
+  const [unreadMessages, setUnreadMessages] = useState(null);
+
+  useEffect(() => {
+    authCheck();
+  }, [authCheck]);
+
+  useEffect(() => {
+    function countUnreadMessages() {
+      const messagesSentToMe = messages.filter(message => message.receiver === user.id);
+      const unreadMessages = messagesSentToMe.filter(message => message.isRead === 0);
+      setUnreadMessages(unreadMessages);
+    };
+
+    if (messages && user) {
+      countUnreadMessages()
+    }
+  }, [messages, user]);
 
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector("div").style.display = ""
@@ -32,7 +51,7 @@ function MenuBar({user, signOut, messages}) {
           <div>item C</div>
         </div>
       </div>
-      {messages? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{messages.length}</div> :
+  {unreadMessages? <div onClick={() => history.push("/inbox")} style={{ flexBasis: "100px", marginLeft: "auto" }}>Message{unreadMessages.length}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
       {user? <div style={{ flexBasis: "100px", marginLeft: "auto" }}>Welcome {user.firstname}</div> :
         <div style={{ flexBasis: "100px", marginLeft: "auto" }}></div>}
@@ -53,7 +72,8 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
   return {
-    signOut: () => dispatch({type: "SIGN_OUT_ASYNC"})
+    signOut: () => dispatch({type: "SIGN_OUT_ASYNC"}),
+    authCheck: () =>dispatch({type: "AUTH_CHECK_ASYNC"})
   }
 };
 

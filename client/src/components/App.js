@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Router,
   Switch,
@@ -20,12 +20,10 @@ import ErrandDetail from "../pages/ErrandDetail";
 import Inbox from "../pages/Inbox";
 import Message from "../pages/Message";
 
-function App({authCheck}) {
+function App() {
 
   //should it go into menubar?
-  useEffect(() => {
-    authCheck();
-  }, [authCheck]);
+  
 
   // useEffect(() => {
   //   // if user loged in
@@ -111,10 +109,4 @@ function App({authCheck}) {
   );
 };
 
-function mapDispatchToProps(dispatch){
-  return{
-    authCheck: () =>dispatch({type: "AUTH_CHECK_ASYNC"})
-  }
-};
-
-export default connect(null, mapDispatchToProps)(App);
+export default App;

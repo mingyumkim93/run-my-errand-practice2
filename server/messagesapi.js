@@ -24,13 +24,12 @@ module.exports = function (app) {
         });
     });
 
-    // app.get("/message/:id",(req, res) => {
-    //     messagesDao.getMessagesWithUser(req.params.id, req.user.id, function(err,data){
-    //         if(err) res.send(err);
-    //         else res.send(data);
-    //     });
-    // });
+    app.get("/message/:id",(req, res) => {
+        messagesDao.getMessagesWithUser(req.params.id, req.user.id, function(err,data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
 
-    
 }
 

@@ -7,6 +7,7 @@ const middleware = [...getDefaultMiddleware(), sagaMiddleware];
 
 const initialState = {
     user: null,
+    // keep errands here or in Search component?
     errands: null,
     messages: null
 };
@@ -16,14 +17,16 @@ const signIn = createAction("SIGN_IN");
 const signOut = createAction("SIGN_OUT");
 const fetchMessages = createAction("FETCH_MESSAGES");
 const emptyMessages = createAction("EMPTY_MESSAGES");
+const readMessages = createAction("READ_MESSAGES");
 
 const reducer = createReducer(initialState, {
-    // it's ok to mutate state here with toolkit
+    // it's ok to mutate state here because toolkit works with Immer
     [signIn]: (state, action) => { state.user = action.payload },
     [signOut]: (state, action) => { state.user = null },
     [authCheck]: (state, action) => { state.user = action.payload },
     [fetchMessages]: (state, action) => { state.messages = action.payload},
-    [emptyMessages]: (state, action) => { state.messages = null}
+    [emptyMessages]: (state, action) => { state.messages = null},
+    [readMessages]: (state, action) => {state.messages = action.payload}
 });
 
 export const actionCreators = {
