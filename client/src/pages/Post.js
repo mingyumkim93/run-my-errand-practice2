@@ -28,7 +28,7 @@ function Post({user}) {
         return () => mounted = false;
     }, []);
 
-    if(user.length === 0)
+    if(!user)
     {
         alert("login is required!")
         return <Redirect to="/signin"/>

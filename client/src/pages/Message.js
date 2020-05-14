@@ -8,6 +8,7 @@ function Message({ user, sortedMessages, readMessages }) {
     const [messagesWithThisUser, setMessagesWithThisUser] = useState(null);
 
     useEffect(()=>{
+        //render happens twice when user receive message (but not with sending)
         if(sortedMessages)
             setMessagesWithThisUser(sortedMessages[window.location.pathname.split("/")[2]]);
     }, [sortedMessages, setMessagesWithThisUser]);

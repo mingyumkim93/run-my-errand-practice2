@@ -31,7 +31,7 @@ function* signOut() {
     try {
         const res = yield call(api.auth.logout);
         if (res.status === 200) {
-            yield all([put(actionCreators.signOut()), put(actionCreators.emptyMessages())]);
+            yield all([put(actionCreators.signOut()), put(actionCreators.emptyMessages()), put(actionCreators.emptySortedMessages())]);
             yield history.push("/");
         }
     }

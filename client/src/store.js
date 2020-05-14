@@ -19,6 +19,7 @@ const emptyMessages = createAction("EMPTY_MESSAGES");
 const readMessages = createAction("READ_MESSAGES");
 const addMessage = createAction("ADD_MESSAGE");
 const sortMessages = createAction("SORT_MESSAGES");
+const emptySortedMessages = createAction("EMPTY_SORTED_MESSAGES");
 
 const reducer = createReducer(initialState, {
     // it's ok to mutate state here because toolkit works with Immer
@@ -29,6 +30,7 @@ const reducer = createReducer(initialState, {
     [fetchMessages]: (state, action) => { state.messages = action.payload },
     [emptyMessages]: (state, action) => { state.messages = null },
     [readMessages]: (state, action) => { state.messages = action.payload },
+    [emptySortedMessages]: (state, action) => { state.sortedMessages = null },
 
     // none sagas
     [addMessage]: (state, action) => { state.messages.push(action.payload) },
@@ -37,24 +39,24 @@ const reducer = createReducer(initialState, {
         state.messages.forEach(message => {
             // if the message is sent to me
             if (message.sender !== action.payload) {
-              // first message with this user
-              if (!sortedMessages[message.sender]) {
-                sortedMessages = { ...sortedMessages, [message.sender]: [message] };
-              }
-              else {
-                sortedMessages[message.sender].push(message);
-              }
+                // first message with this user
+                if (!sortedMessages[message.sender]) {
+                    sortedMessages = { ...sortedMessages, [message.sender]: [message] };
+                }
+                else {
+                    sortedMessages[message.sender].push(message);
+                }
             }
             // if the message is sent by me
             else {
-              if (!sortedMessages[message.receiver]) {
-                sortedMessages = { ...sortedMessages, [message.receiver]: [message] };
-              }
-              else {
-                sortedMessages[message.receiver].push(message);
-              }
+                if (!sortedMessages[message.receiver]) {
+                    sortedMessages = { ...sortedMessages, [message.receiver]: [message] };
+                }
+                else {
+                    sortedMessages[message.receiver].push(message);
+                }
             }
-          });
+        });
         state.sortedMessages = sortedMessages;
     }
 });
@@ -67,7 +69,8 @@ export const actionCreators = {
     emptyMessages,
     readMessages,
     addMessage,
-    sortMessages
+    sortMessages,
+    emptySortedMessages
 };
 
 const store = configureStore({ reducer, middleware });
