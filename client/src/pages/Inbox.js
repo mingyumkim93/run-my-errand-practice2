@@ -6,11 +6,9 @@ import api from "../utils/api";
 function Inbox({sortedMessages}) {
 
     const [idNameTable, setIdNameTable] = useState(null);
-
     useEffect(() => {
         let idAndFullName = {};
             if (sortedMessages) {
-                console.log("??")
                 Object.keys(sortedMessages).forEach(key => {
                     api.auth.getFullNameById(key).then(res => {
                         idAndFullName = { ...idAndFullName, [key]: res.data[0].firstname + " " + res.data[0].lastname }

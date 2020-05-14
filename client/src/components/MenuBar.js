@@ -28,7 +28,7 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
     if (user && addMessage) {
       socket.emit("join", user.id);
       socket.on("message", (message) => addMessage(message[0]));
-      socket.on("message-error", () => { alert("something went wrong with message") });
+      socket.on("message-error", () => alert("something went wrong with message"));
     }
   }, [user, addMessage]);
 

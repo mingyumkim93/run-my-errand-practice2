@@ -63,7 +63,8 @@ function* readMessages(action) {
                 else
                     return message
             });
-            yield put(actionCreators.readMessages(updatedMessages));
+            if(JSON.stringify(messages) !== JSON.stringify(updatedMessages))
+                yield put(actionCreators.readMessages(updatedMessages));
         }
     }
     catch (err) {

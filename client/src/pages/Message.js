@@ -5,18 +5,17 @@ import { connect } from "react-redux";
 function Message({ user, sortedMessages, readMessages }) {
 
     const [messageInput, setMessageInput] = useState("");
-    const [messagesWithUser, setMessagesWithUser] = useState(null);
+    const [messagesWithThisUser, setMessagesWithThisUser] = useState(null);
 
     useEffect(()=>{
         if(sortedMessages)
-            setMessagesWithUser(sortedMessages[window.location.pathname.split("/")[2]])
-    }, [sortedMessages, setMessagesWithUser]);
+            setMessagesWithThisUser(sortedMessages[window.location.pathname.split("/")[2]]);
+    }, [sortedMessages, setMessagesWithThisUser]);
 
     useEffect(() => {
-        if (messagesWithUser && user && readMessages) {
-            readMessages(user.id, window.location.pathname.split("/")[2])
-        }
-    }, [messagesWithUser, user, readMessages]);
+        if (messagesWithThisUser && user && readMessages) 
+            readMessages(user.id, window.location.pathname.split("/")[2]);
+    }, [messagesWithThisUser, user, readMessages]);
 
     function sendMessage() {
         socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: user.id });
@@ -25,7 +24,7 @@ function Message({ user, sortedMessages, readMessages }) {
 
     return (
         <div>Message
-            {messagesWithUser && messagesWithUser.map(message =>
+            {messagesWithThisUser && messagesWithThisUser.map(message =>
                 <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div>
             )}
             <input autoFocus value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && e.target.value !== "") sendMessage() }} />
