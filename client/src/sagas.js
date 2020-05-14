@@ -67,7 +67,7 @@ function* readMessages(action) {
         }
     }
     catch (err) {
-        alert("something went wrong on marking messages as read")
+        alert("something went wrong on marking messages as read");
     }
 };
 

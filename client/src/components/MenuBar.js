@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import socket from "../utils/socket";
 import { actionCreators } from "../store";
 
-function MenuBar({ user, signOut, messages, authCheck, addMessage }) {
+function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages }) {
 
   const [unreadMessages, setUnreadMessages] = useState(null);
 
@@ -30,7 +30,13 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage }) {
       socket.on("message", (message) => addMessage(message[0]));
       socket.on("message-error", () => { alert("something went wrong with message") });
     }
-  }, [user, addMessage])
+  }, [user, addMessage]);
+
+  useEffect(()=>{
+    if(messages && sortMessages && user){
+      sortMessages(user.id)
+    }
+  }, [messages, sortMessages, user])
 
   const onMenuHover = (e) => {
     e.target.parentElement.querySelector("div").style.display = ""
@@ -83,7 +89,8 @@ function mapDispatchToProps(dispatch) {
   return {
     signOut: () => dispatch({ type: "SIGN_OUT_ASYNC" }),
     authCheck: () => dispatch({ type: "AUTH_CHECK_ASYNC" }),
-    addMessage: (message) => dispatch(actionCreators.addMessage(message))
+    addMessage: (message) => dispatch(actionCreators.addMessage(message)),
+    sortMessages: (id) => dispatch(actionCreators.sortMessages(id))
   }
 };
 
