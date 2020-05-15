@@ -24,6 +24,7 @@ export default function ErrandDetail() {
             <div>{errand.id}</div>
             <div>{errand.title}</div>
             <div>{errand.description}</div>
+            <div>{errand.fee}</div>
             {/* prevent user change url to whatever number && only authenticated user can send message */}
             <div onClick={()=>history.push(`/message/${errand.poster}`)}>Contact host</div>
         </div>

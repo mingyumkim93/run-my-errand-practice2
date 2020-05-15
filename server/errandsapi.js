@@ -5,6 +5,7 @@ module.exports = function (app) {
     app.post("/errand/post", (req, res) => {
         req.body.createdAt = new Date();
         req.body.id = uuid();
+        req.body.state = 0;
         errandDao.createNewErrand(req.body, function(err,data){
             if(err) res.send(err);
             else res.send(data);

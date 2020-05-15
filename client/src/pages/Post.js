@@ -5,6 +5,7 @@ import API from "../utils/api";
 import PlaceSearchInput from "../components/PlaceSearchInput";
 import WrappedMap from "../components/Map";
 import { connect } from "react-redux";
+import history from "../history";
 
 function Post({user}) {
     
@@ -12,11 +13,11 @@ function Post({user}) {
     const HELSINKI_COORDINATES = {lat:60.1699, lng:24.9384};
     const [mapCenter, setMapCenter] = useState(null); 
     const [markerPosition, setMarkerPosition] = useState(null);
-    const [address, setAddress] = useState("");
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-     
-    
+    const [address, setAddress] = useState(null);
+    const [title, setTitle] = useState(null);
+    const [description, setDescription] = useState(null);
+    const [fee, setFee] = useState(null);
+
     useEffect(() => {
         let mounted = true;
         navigator.geolocation.getCurrentPosition(position => {
@@ -28,6 +29,18 @@ function Post({user}) {
         return () => mounted = false;
     }, []);
 
+    function post() {
+        API.errand.postErrand({
+            title,
+            description,
+            address,
+            coordinates: JSON.stringify(markerPosition),
+            poster: user.id,
+            fee
+        })
+            .then((res) => history.push("/")).catch((err) => alert(err));
+    };
+
     if(!user)
     {
         alert("login is required!")
@@ -38,6 +51,7 @@ function Post({user}) {
         <div>
             <input placeholder="Title" onChange={(e)=>setTitle(e.target.value)}/>
             <input placeholder="Description" onChange={(e)=>setDescription(e.target.value)}/>
+            <input placeholder="Fee" type="number" onChange={(e)=>setFee(e.target.value)}/>
             <PlaceSearchInput setMapCenter={setMapCenter} setAddress={setAddress} setMarkerPosition={setMarkerPosition} />
             <div style={{ height: "50vh", width: "50vh" }}>
                 <WrappedMap
@@ -51,14 +65,7 @@ function Post({user}) {
                     <Marker ref={ref=>markerRef=ref} position={markerPosition || HELSINKI_COORDINATES} draggable={true} onDragEnd={()=>setMarkerPosition(markerRef.getPosition().toJSON())}/>
                </WrappedMap>
             </div>
-            <button onClick={()=>API.errand.postErrand({title,
-                                                        description,
-                                                        address, 
-                                                        coordinates:JSON.stringify(markerPosition),
-                                                        poster:user.id
-                                                    })
-                                                        .then((res)=>console.log(res)).catch((err)=>console.log(err))
-                                                        }>Create New Errand</button>
+            <button onClick={()=>post()}>Create New Errand</button>
         </div>
     );
 };
