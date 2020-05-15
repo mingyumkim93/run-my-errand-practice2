@@ -30,15 +30,19 @@ function Post({user}) {
     }, []);
 
     function post() {
-        API.errand.postErrand({
-            title,
-            description,
-            address,
-            coordinates: JSON.stringify(markerPosition),
-            poster: user.id,
-            fee
-        })
-            .then((res) => history.push("/")).catch((err) => alert(err));
+        if (title && description && fee && address && markerPosition) {
+            API.errand.postErrand({
+                title,
+                description,
+                address,
+                coordinates: JSON.stringify(markerPosition),
+                poster: user.id,
+                fee
+            })
+                .then((res) => history.push("/")).catch((err) => alert(err));
+        }
+        else
+            alert("please fill every input in");
     };
 
     if(!user)
@@ -65,7 +69,7 @@ function Post({user}) {
                     <Marker ref={ref=>markerRef=ref} position={markerPosition || HELSINKI_COORDINATES} draggable={true} onDragEnd={()=>setMarkerPosition(markerRef.getPosition().toJSON())}/>
                </WrappedMap>
             </div>
-            <button onClick={()=>post()}>Create New Errand</button>
+            <button onClick={()=>{post()}}>Create New Errand</button>
         </div>
     );
 };
