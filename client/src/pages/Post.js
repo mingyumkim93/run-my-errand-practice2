@@ -55,7 +55,7 @@ function Post({user}) {
                                                         description,
                                                         address, 
                                                         coordinates:JSON.stringify(markerPosition),
-                                                        poster:user[0].id
+                                                        poster:user.id
                                                     })
                                                         .then((res)=>console.log(res)).catch((err)=>console.log(err))
                                                         }>Create New Errand</button>
