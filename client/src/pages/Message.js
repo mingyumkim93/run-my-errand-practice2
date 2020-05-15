@@ -19,7 +19,7 @@ function Message({ user, sortedMessages, readMessages }) {
     }, [messagesWithThisUser, user, readMessages]);
 
     function sendMessage() {
-        socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: user.id });
+        socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: user.id, type:"CHAT" });
         setMessageInput("");
     };
 
