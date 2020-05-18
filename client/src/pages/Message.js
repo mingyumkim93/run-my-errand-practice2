@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import socket from "../utils/socket";
 import { connect } from "react-redux";
+import Offer from "../components/Offer";
 
 function Message({ user, sortedMessages, readMessages }) {
 
@@ -26,8 +27,9 @@ function Message({ user, sortedMessages, readMessages }) {
     return (
         <div>Message
             {messagesWithThisUser && messagesWithThisUser.map(message =>
-                <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div>
-            )}
+                message.type === "CHAT" ? <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div> : 
+                <Offer key={message.id} message={message} user={user}/> 
+            )} 
             <input autoFocus value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && e.target.value !== "") sendMessage() }} />
             <button onClick={sendMessage}>Send</button>
         </div>
