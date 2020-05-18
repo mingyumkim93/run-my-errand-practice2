@@ -4,10 +4,9 @@ function Offer ({message, user}){
     return(
         <>
             <div key={message.id}>
-                <h4>{message.sender} sent offer to this errand</h4>
-                {/* add "errand" column in message table so that it can refer errand here */}
+            <h4>{message.sender} sent offer to this errand {message.errand}</h4>
                 {message.sender} : {message.content} {message.createdAt} 
-                {/* poster accepts -> send notification to the runner & errand state change -> runner accpets? or just immediately starts?... */}
+                {/* poster accepts -> send notification to the runner & errand state change -> runner accpets*/}
                 {message.sender === user.id ?<button>Withd raw</button> :<button>Accept</button>}
                 </div>
         </>
