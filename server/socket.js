@@ -1,4 +1,5 @@
 const messageDao = require("./messagesDao");
+const { uuid } = require("uuidv4");
 
 module.exports = function(server){
     const io = require("socket.io").listen(server);
@@ -8,17 +9,12 @@ module.exports = function(server){
         socket.on("error", ()=>console.log("Recieved error from client: ", socket.id));
         socket.on("join",(id)=> socket.join(id));
         socket.on("message", (message) => {
-            message = {...message, createdAt: new Date(), isRead:0}
+            message = {...message, createdAt: new Date(), isRead:0, id:uuid()}
             messageDao.createNewMessage(message, function(err,data){
                 if(err) socket.emit("message-error");
                 else {
-                    messageDao.getMessageById(data.insertId, function(err,data){
-                        if(err) socket.emit("message-error");
-                        else{
-                            socket.emit("message", data);
-                            socket.broadcast.to(message.receiver).emit("message", data);
-                        }
-                    });
+                    socket.emit("message", message);
+                    socket.broadcast.to(message.receiver).emit("message", message);
                 };
             });
         });

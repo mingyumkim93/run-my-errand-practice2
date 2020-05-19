@@ -19,12 +19,6 @@ const messagesDao = {
         });
     },
     
-    getMessageById(id,cb){
-        mysqlConn.query("select * from messages where id=?",[id],(error, data) => {
-            cb(error, data);
-        });
-    },
-
     markMessagesAsRead(myId,othersId,cb){
         mysqlConn.query("update messages set isRead = 1 where sender=? and receiver=?",[othersId, myId], (error, data) => {
             cb(error, data);

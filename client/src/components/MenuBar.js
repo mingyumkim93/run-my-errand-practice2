@@ -29,7 +29,7 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
   useEffect(() => {
     if (user && addMessage) {
       socket.emit("join", user.id);
-      socket.on("message", (message) => addMessage(message[0]));
+      socket.on("message", (message) => addMessage(message));
       socket.on("message-error", () => alert("something went wrong with message"));
     }
   }, [user, addMessage]);
