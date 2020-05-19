@@ -5,6 +5,7 @@ const auth = require("./auth");
 const userApi = require("./userapi"); 
 const errandsApi = require("./errandsapi");
 const messagesApi = require("./messagesapi");
+const stateTransitionApi = require("./statetransitionapi");
 const socket = require("./socket");
 
 const app = express();
@@ -18,7 +19,7 @@ auth(app);
 userApi(app);
 errandsApi(app);
 messagesApi(app);
+stateTransitionApi(app);
 socket(server);
-
 
 

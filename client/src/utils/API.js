@@ -42,5 +42,10 @@ export default {
         markMessagesAsRead(user, other) {
             return axios.get("/message/read", { params: { user, other } });
         }
+    },
+    stateTransition:{
+        CreateNewTransition(payload){
+            return axios.post("/state-transition/create", payload);
+        }
     }
 }
