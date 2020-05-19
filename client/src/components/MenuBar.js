@@ -45,7 +45,7 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
       <span onClick={() => history.push("/")}>LOGO</span>
       <span style={{marginLeft:"50px"}} onClick={() => history.push("/search")}>For Runner</span>
       <span style={{marginLeft:"50px"}} onClick={() => history.push("/post")}>For Poster</span>
-      {unreadMessages ? <span style={{marginLeft:"50px"}} onClick={() => history.push("/inbox")}>Messages{unreadMessages.length}</span> : <></>}
+      {unreadMessages ? <span style={{marginLeft:"50px"}} onClick={() => history.push("/inbox")}>Inbox{unreadMessages.length}</span> : <></>}
       {user ? <span style={{marginLeft:"50px"}} onClick={() => signOut()}>Sign out</span> : <span style={{marginLeft:"50px"}} onClick={() => history.push("/signin")}>Sign in</span>}
     </>
   );

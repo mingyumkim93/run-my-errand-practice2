@@ -25,7 +25,7 @@ function Message({ user, sortedMessages, readMessages }) {
     };
 
     return (
-        <div>Message
+        <div>
             {messagesWithThisUser && messagesWithThisUser.map(message =>
                 message.type === "CHAT" ? <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div> : 
                 <Offer key={message.id} message={message} user={user}/> 

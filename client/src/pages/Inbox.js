@@ -21,8 +21,6 @@ function Inbox({sortedMessages}) {
     if(idNameTable)
     return (
         <div>
-            <div>Inbox Page</div>
-            <button onClick={()=>console.log(sortedMessages)}>asd</button>
             {sortedMessages && Object.keys(sortedMessages).map((person) =>
                 <div onClick={() => history.push(`/message/${person}`)} key={person}>{idNameTable[person]} :  {sortedMessages[person][sortedMessages[person].length - 1].content}</div>
             )}
