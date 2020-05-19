@@ -5,6 +5,8 @@ import Offer from "../components/Offer";
 
 function Message({ user, sortedMessages, readMessages }) {
 
+    //todo: fix error when user sign out in message
+
     const [messageInput, setMessageInput] = useState("");
     const [messagesWithThisUser, setMessagesWithThisUser] = useState(null);
 

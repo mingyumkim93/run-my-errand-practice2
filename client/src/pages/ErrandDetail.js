@@ -22,7 +22,7 @@ function ErrandDetail({ user }) {
     };
 
     function sendOffer() {
-        socket.emit("message", { content, fee, receiver: errand.poster, sender: user.id, type: "OFFER", errand: errand.id, state:0 });
+        socket.emit("message", { content, fee, receiver: errand.poster, sender: user.id, type: "OFFER", errand: errand.id });
     };
 
     if (!errand) return (<div> loading...</div>);
