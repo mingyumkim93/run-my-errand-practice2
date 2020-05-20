@@ -11,6 +11,8 @@ module.exports = function(server){
         socket.on("message", (message) => {
             message = {...message, createdAt: new Date(), isRead:0, id:uuid()}
             messageDao.createNewMessage(message, function(err,data){
+                console.log(err);
+                console.log(data);
                 if(err) socket.emit("message-error");
                 else {
                     socket.emit("message", message);

@@ -11,7 +11,7 @@ function Message({ user, sortedMessages, readMessages }) {
     const [messagesWithThisUser, setMessagesWithThisUser] = useState(null);
 
     useEffect(()=>{
-        //render happens twice when user receive message (but not with sending)
+        //render happens twice when user receive message (but not with sending)(guessing it's emitted twice)
         if(sortedMessages)
             setMessagesWithThisUser(sortedMessages[window.location.pathname.split("/")[2]]);
     }, [sortedMessages, setMessagesWithThisUser]);
@@ -29,8 +29,9 @@ function Message({ user, sortedMessages, readMessages }) {
     return (
         <div>
             {messagesWithThisUser && messagesWithThisUser.map(message =>
+                message.type === "NOTIFICATION" ? <div key={message.id} style={{color:"red"}}>{message.content}</div> :
                 message.type === "CHAT" ? <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div> : 
-                <Offer key={message.id} message={message} user={user}/> 
+                message.type === "OFFER"? <Offer key={message.id} message={message} user={user}/> : <div>Unknown Message!</div>
             )} 
             <input autoFocus value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && e.target.value !== "") sendMessage() }} />
             <button onClick={sendMessage}>Send</button>

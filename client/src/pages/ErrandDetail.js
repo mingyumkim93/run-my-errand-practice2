@@ -25,6 +25,10 @@ function ErrandDetail({ user }) {
         socket.emit("message", { content, fee, receiver: errand.poster, sender: user.id, type: "OFFER", errand: errand.id });
     };
 
+    function notifyOffer(){
+        socket.emit("message", { content:`${user.id} has sent offer`, receiver: errand.poster, sender: user.id, type: "NOTIFICATION" });
+    };
+
     if (!errand) return (<div> loading...</div>);
     return (
         <div>
@@ -37,7 +41,7 @@ function ErrandDetail({ user }) {
                 <h3>Create offer</h3>
                 <input placeholder="fee" type="number" onChange={(e) => setFee(e.target.value)} />
                 <input placeholder="comment to poster" onChange={(e) => setContent(e.target.value)} />
-                <button onClick={() => sendOffer()}>Send Offer</button>
+                <button onClick={() => {notifyOffer(); sendOffer();}}>Send Offer</button>
             </div>
             {/* prevent user change url to whatever number && only authenticated user can send message */}
             <div onClick={() => history.push(`/message/${errand.poster}`)}>Contact host</div>
