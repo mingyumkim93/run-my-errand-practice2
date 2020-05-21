@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import api from "../utils/api";
 import socket from "../utils/socket";
 function Offer({ message, user }) {
 
     const [offerState, setOfferState] = useState(null);
 
-    useEffect(() => {
+    const getCurrentState = useCallback(()=> {
         api.stateTransition.getCurrentState(message.id).then(res => {
             if (res.data.length === 0) setOfferState("initial");
             else setOfferState(res.data[0].new_state);
         });
     }, [message]);
+
+    useEffect(() => {
+        getCurrentState()
+    }, [message, getCurrentState]);
+
+    useEffect(()=>{
+        socket.on("state_changed",()=>getCurrentState())
+    },[getCurrentState])
 
     function notifyWidhdraw() {
         socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.receiver, sender: user.id, type: "NOTIFICATION" });
