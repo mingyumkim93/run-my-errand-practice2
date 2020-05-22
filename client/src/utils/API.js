@@ -28,8 +28,14 @@ export default {
         fetchAErrand(payload) {
             return axios.get(payload);
         },
-        updateErrandToRunningMode(payload){
+        updateErrandToRunningMode(payload) {
             return axios.put("/errand/:id", payload)
+        },
+        fetchErrandsIRun(payload) {
+            return axios.get("/fetch-mypost", { params: { id: payload } });
+        },
+        fetchErrandsIPost(payload) {
+            return axios.get("/fetch-myrun", { params: { id: payload } });
         }
     },
     message: {
@@ -46,13 +52,13 @@ export default {
             return axios.get("/message/read", { params: { user, other } });
         }
     },
-    stateTransition:{
-        createNewTransition(payload){
+    stateTransition: {
+        createNewTransition(payload) {
             return axios.post("/state-transition/create", payload);
         },
-        getCurrentState(payload){
-            return axios.get("/state-transition", { params: { id: payload}})   
+        getCurrentState(payload) {
+            return axios.get("/state-transition", { params: { id: payload } })
         }
-    
+
     }
 }

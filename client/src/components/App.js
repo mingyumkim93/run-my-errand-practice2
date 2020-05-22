@@ -15,6 +15,7 @@ import Post from "../pages/Post";
 import ErrandDetail from "../pages/ErrandDetail";
 import Inbox from "../pages/Inbox";
 import Message from "../pages/Message";
+import MyErrands from "../pages/MyErrands";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/errand/:id" component={ErrandDetail}/>
           <Route path="/inbox" component={Inbox}/>
           <Route path="/message/:id" component={Message}/>
+          <Route path="/my-errands" component={MyErrands}/>
         </Switch>
       </Router>
     </div>

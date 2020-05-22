@@ -19,6 +19,7 @@ module.exports = function (app) {
     });
 
     app.get("/errand/:id", (req,res) => {
+        console.log("???")
         errandDao.getErrandById(req.params.id, function(err, data){
             if(err) res.send(err);
             else res.send(data);
@@ -31,4 +32,19 @@ module.exports = function (app) {
             else res.send(data);
         });
     });
-}
+
+    app.get("/fetch-mypost", (req,res) => {
+        console.log("asd",req.query.id)
+        errandDao.getErrandsIPost(req.query.id, function(err, data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
+
+    app.get("/fetch-myrun", (req,res) => {
+        errandDao.getErrandsIRun(req.query.id, function(err, data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
+};

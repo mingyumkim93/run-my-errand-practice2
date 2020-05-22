@@ -24,7 +24,19 @@ const errandDao = {
         mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand], (error, data) => {
             cb(error, data);
         });
-    }
+    },
+
+    getErrandsIPost(id, cb){
+        mysqlConn.query("select * from errands where poster = ?", id, (error, data) => {
+            cb(error, data);
+        });
+    },
+
+    getErrandsIRun(id, cb){
+        mysqlConn.query("select * from errands where runner = ?", id, (error, data) => {
+            cb(error, data);
+        });
+    },
 }
 
 module.exports = errandDao;
