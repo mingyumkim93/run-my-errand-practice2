@@ -18,7 +18,16 @@ function Offer({ message, user }) {
 
     useEffect(()=>{
         socket.on("state_changed",()=>getCurrentState())
-    },[getCurrentState])
+    },[getCurrentState]);
+
+    let buttons = document.getElementsByClassName("offer-control-btn");
+
+    function disableButtons() {
+        let i;
+        for(i = 0; i < buttons.length; i++){
+            buttons[i].disabled = true;
+        }
+    };
 
     function notifyWidhdraw() {
         socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.receiver, sender: user.id, type: "NOTIFICATION" });
@@ -37,27 +46,31 @@ function Offer({ message, user }) {
     };
 
     function withdrawOffer() {
+        disableButtons();
         api.stateTransition.createNewTransition({ object_id: message.id, new_state: "canceled" }).then(res => {
-            // if db has updated successfully
-            notifyWidhdraw();
+            if(res.status===200)
+                notifyWidhdraw();
+            // what to do if there is error?
         });
     };
 
     function accecptOffer() {
+        disableButtons();
         api.stateTransition.createNewTransition({ object_id: message.id, new_state: "accepted" }).then(res => {
-            // if db has updated successfully
-            notifyAccept();
+            if(res.status===200)
+                notifyAccept();
         });
     };
 
     function confirmOffer() {
+        disableButtons();
         api.stateTransition.createNewTransition({ object_id: message.id, new_state: "confirmed" }).then(res => {
-            // if db has updated successfully
-            notifyConfirm();
+            if(res.status===200)
+                notifyConfirm();
         });
         api.stateTransition.createNewTransition({ object_id: message.errand, new_state: "running" }).then(res => {
-            // if db has updated successfully
-            notifyErrandRunning();
+            if(res.status===200)
+                notifyErrandRunning();
         });
     };
 
@@ -65,8 +78,8 @@ function Offer({ message, user }) {
         return (
             <>
                 {message.sender} : {message.content} {message.createdAt}
-                {message.sender === user.id ? <button onClick={() => withdrawOffer()}>Withdraw</button> :
-                    <button onClick={() => accecptOffer()}>Accept</button>}
+                {message.sender === user.id ? <button className="offer-control-btn" onClick={() => withdrawOffer()}>Withdraw</button> :
+                    <button className="offer-control-btn" onClick={() => accecptOffer()}>Accept</button>}
             </>
         );
 
@@ -75,8 +88,8 @@ function Offer({ message, user }) {
             <>
                 {message.sender} : {message.content} {message.createdAt}
                 {message.sender === user.id ? <div>
-                    <button onClick={() => confirmOffer()}>Confirm</button>
-                    <button onClick={() => withdrawOffer()}>WithDraw</button>
+                    <button className="offer-control-btn"  onClick={() => confirmOffer()}>Confirm</button>
+                    <button className="offer-control-btn"  onClick={() => withdrawOffer()}>WithDraw</button>
                 </div> : <></>}
             </>
         );

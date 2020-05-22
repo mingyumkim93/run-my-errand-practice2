@@ -14,7 +14,6 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
 
   useEffect(() => {
     function countUnreadMessages() {
-      console.log("countUnreadMessages");
     const messagesSentToMe = messages.filter(message => message.receiver === user.id);
       const unreadMessages = messagesSentToMe.filter(message => message.isRead === 0);
       setUnreadMessages(unreadMessages);
@@ -37,7 +36,6 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
 
   useEffect(()=>{
     if(messages && sortMessages && user){
-      console.log("sortMessages");
       sortMessages(user.id)
     }
   }, [messages, sortMessages, user]);

@@ -11,13 +11,11 @@ function Message({ user, sortedMessages, readMessages }) {
     const [messagesWithThisUser, setMessagesWithThisUser] = useState(null);
 
     useEffect(()=>{
-        console.log("setMessagesWithThisUser");
         if(sortedMessages)
             setMessagesWithThisUser(sortedMessages[window.location.pathname.split("/")[2]]);
     }, [sortedMessages, setMessagesWithThisUser]);
 
     useEffect(() => {
-        console.log("read messages");
         if (messagesWithThisUser && user && readMessages) 
             readMessages(user.id, window.location.pathname.split("/")[2]);
     }, [messagesWithThisUser, user, readMessages]);
