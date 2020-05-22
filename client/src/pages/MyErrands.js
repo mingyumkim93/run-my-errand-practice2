@@ -4,26 +4,27 @@ import { connect } from "react-redux";
 
 function MyErrands({user}){
 
-    const [errandsImRunning, setErrandsImRunning] = useState(null);
-    const [errandsImPosting, setErrandsImPosting] = useState(null);
+    const [myErrandsRun, setMyErrandsRun] = useState(null);
+    const [myErandsPost, setMyErrandsPost] = useState(null);
     const [tab, setTab] = useState("post");
 
     useEffect(()=>{
         if(user)
         {
-            api.errand.fetchErrandsIPost(user.id).then(res=>setErrandsImPosting(res.data));
-            api.errand.fetchErrandsIRun(user.id).then(res=>setErrandsImRunning(res.data));
+            api.errand.fetchErrandsIPost(user.id).then(res=>setMyErrandsPost(res.data));
+            api.errand.fetchErrandsIRun(user.id).then(res=>setMyErrandsRun(res.data));
         }
     },[user]);
 
     return(
         <>
-            <h3>my errands</h3>
+            <br/>
             <button onClick={()=>{
                 if(tab === "post") setTab("run")
                 else setTab("post")
             }}>{tab}</button> 
-            {tab === "post" ? (errandsImPosting && errandsImPosting.map(errand => <div>{errand.id}</div>)) : (errandsImRunning && errandsImRunning.map(errand => <div>{errand.id}</div>))}
+            {tab === "post" ? (myErandsPost && myErandsPost.map(errand => <div key={errand.id}>{errand.id}</div>)) : 
+                              (myErrandsRun && myErrandsRun.map(errand => <div key={errand.id}>{errand.id}</div>))}
         </>
     );
 };
