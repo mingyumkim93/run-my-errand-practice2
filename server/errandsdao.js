@@ -18,6 +18,12 @@ const errandDao = {
         mysqlConn.query("select * from errands where id = ?", id, (error, data) => {
             cb(error, data);
         });
+    },
+
+    updateToRunningMode(errand, runner, fee, cb){
+        mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand], (error, data) => {
+            cb(error, data);
+        });
     }
 }
 

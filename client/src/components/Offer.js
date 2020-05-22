@@ -3,6 +3,8 @@ import api from "../utils/api";
 import socket from "../utils/socket";
 function Offer({ message, user }) {
 
+    //todo : timeout
+
     const [offerState, setOfferState] = useState(null);
 
     const getCurrentState = useCallback(()=> {
@@ -70,14 +72,20 @@ function Offer({ message, user }) {
         });
         api.stateTransition.createNewTransition({ object_id: message.errand, new_state: "running" }).then(res => {
             if(res.status===200)
+            {
                 notifyErrandRunning();
+            }
         });
+        api.errand.updateErrandToRunningMode({errand:message.errand, runner:user.id, fee:message.fee}).then(res=>{
+            // if errand has updated correctly
+            // maybe notifyErrandRunning here
+        })
     };
 
     if (offerState === "initial")
         return (
             <>
-                {message.sender} : {message.content} {message.createdAt}
+                {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
                 {message.sender === user.id ? <button className="offer-control-btn" onClick={() => withdrawOffer()}>Withdraw</button> :
                     <button className="offer-control-btn" onClick={() => accecptOffer()}>Accept</button>}
             </>
@@ -86,7 +94,7 @@ function Offer({ message, user }) {
     else if (offerState === "accepted")
         return (
             <>
-                {message.sender} : {message.content} {message.createdAt}
+                {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
                 {message.sender === user.id ? <div>
                     <button className="offer-control-btn"  onClick={() => confirmOffer()}>Confirm</button>
                     <button className="offer-control-btn"  onClick={() => withdrawOffer()}>WithDraw</button>
@@ -97,13 +105,13 @@ function Offer({ message, user }) {
     else if (offerState === "canceled")
         return (
             <>
-                (Canceled) {message.sender} : {message.content} {message.createdAt}
+                (Canceled) {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
             </>
         );
     else if (offerState === "confirmed")
         return (
             <>
-                (confirmed) {message.sender} : {message.content} {message.createdAt}
+                (confirmed) {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
             </>
         );
 

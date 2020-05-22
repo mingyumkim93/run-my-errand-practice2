@@ -27,6 +27,9 @@ export default {
         },
         fetchAErrand(payload) {
             return axios.get(payload);
+        },
+        updateErrandToRunningMode(payload){
+            return axios.put("/errand/:id", payload)
         }
     },
     message: {

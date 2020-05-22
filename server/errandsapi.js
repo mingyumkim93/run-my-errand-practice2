@@ -24,4 +24,11 @@ module.exports = function (app) {
             else res.send(data);
         });
     });
+
+    app.put("/errand/:id", (req,res) => {
+        errandDao.updateToRunningMode(req.body.errand, req.body.runner, req.body.fee, function(err, data){
+            if(err) res.send(err);
+            else res.send(data);
+        });
+    });
 }
