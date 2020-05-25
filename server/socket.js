@@ -9,16 +9,22 @@ module.exports = function (server) {
         socket.on("error", () => console.log("Recieved error from client: ", socket.id));
         socket.on("join", (id) => socket.join(id));
         socket.on("message", (message) => {
-            if(message.type ==="NOTIFICATION") {
-                socket.emit("state_changed");
-                socket.broadcast.to(message.receiver).emit("state_changed");
-            }
+            
             message = { ...message, createdAt: new Date(), isRead: 0, id: uuid() }
             messageDao.createNewMessage(message, function (err, data) {
                 if (err) socket.emit("message-error");
                 else {
-                    socket.emit("message", message);
-                    socket.broadcast.to(message.receiver).emit("message", message);
+                    if (message.type === "NOTIFICATION") {
+                        socket.broadcast.to(message.receiver).emit("state_changed");
+                        if (socket.rooms[message.receiver])
+                            socket.emit("message", message); // emit to myself
+                        else
+                            socket.broadcast.to(message.receiver).emit("message", message); //emit to the other one
+                    }
+                    else{
+                        socket.emit("message", message);
+                        socket.broadcast.to(message.receiver).emit("message", message);
+                    }
                 };
             });
         });

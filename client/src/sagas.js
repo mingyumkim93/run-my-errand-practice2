@@ -60,6 +60,9 @@ function* readMessages(action) {
             const updatedMessages = messages.map(message => {
                 if (message.sender === action.othersId && message.receiver === action.id)
                     return { ...message, isRead: 1 }
+                else if(message.receiver === action.id && message.relatedUser === action.othersId){
+                    return { ...message, isRead: 1 }
+                }
                 else
                     return message
             });

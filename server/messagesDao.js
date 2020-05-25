@@ -20,7 +20,7 @@ const messagesDao = {
     },
     
     markMessagesAsRead(myId,othersId,cb){
-        mysqlConn.query("update messages set isRead = 1 where sender=? and receiver=?",[othersId, myId], (error, data) => {
+        mysqlConn.query("update messages set isRead = 1 where (sender=? and receiver=?) or (receiver=? and relatedUser=?)",[othersId, myId, myId, othersId], (error, data) => {
             cb(error, data);
         });
     }

@@ -32,19 +32,23 @@ function Offer({ message, user }) {
     };
 
     function notifyWidhdraw() {
-        socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.receiver, sender: user.id, type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
     };
 
     function notifyAccept() {
-        socket.emit("message", { content: `${user.id} has accepted offer`, receiver: message.sender, sender: user.id, type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has accepted offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has accepted offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
     };
 
     function notifyConfirm() {
-        socket.emit("message", { content: `${user.id} has confirmed offer`, receiver: message.receiver, sender: user.id, type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has confirmed offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
+        socket.emit("message", { content: `${user.id} has confirmed offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
     };
 
     function notifyErrandRunning() {
-        socket.emit("message", { content: `Now errand is in running mode`, receiver: message.receiver, sender: user.id, type: "NOTIFICATION" });
+        socket.emit("message", { content: `Now errand is in running mode`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
+        socket.emit("message", { content: `Now errand is in running mode`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
     };
 
     function withdrawOffer() {

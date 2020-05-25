@@ -38,24 +38,38 @@ const reducer = createReducer(initialState, {
         let sortedMessages = {};
         state.messages.forEach(message => {
             // if the message is sent to me
-            if (message.sender !== action.payload) {
-                // first message with this user
-                if (!sortedMessages[message.sender]) {
-                    sortedMessages = { ...sortedMessages, [message.sender]: [message] };
+
+            if (message.type === "NOTIFICATION") {
+                //notification has receiver and anotherReceiver
+                if (!sortedMessages[message.relatedUser]) {
+                    sortedMessages = { ...sortedMessages, [message.relatedUser]: [message] };
                 }
                 else {
-                    sortedMessages[message.sender].push(message);
+                    sortedMessages[message.relatedUser].push(message);
                 }
             }
-            // if the message is sent by me
             else {
-                if (!sortedMessages[message.receiver]) {
-                    sortedMessages = { ...sortedMessages, [message.receiver]: [message] };
+
+                if (message.sender !== action.payload) {
+                    // first message with this user
+                    if (!sortedMessages[message.sender]) {
+                        sortedMessages = { ...sortedMessages, [message.sender]: [message] };
+                    }
+                    else {
+                        sortedMessages[message.sender].push(message);
+                    }
                 }
+                // if the message is sent by me
                 else {
-                    sortedMessages[message.receiver].push(message);
+                    if (!sortedMessages[message.receiver]) {
+                        sortedMessages = { ...sortedMessages, [message.receiver]: [message] };
+                    }
+                    else {
+                        sortedMessages[message.receiver].push(message);
+                    }
                 }
             }
+
         });
         state.sortedMessages = sortedMessages;
     }

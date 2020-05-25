@@ -26,7 +26,8 @@ function ErrandDetail({ user }) {
     };
 
     function notifyOffer(){
-        socket.emit("message", { content:`${user.id} has sent offer`, receiver: errand.poster, sender: user.id, type: "NOTIFICATION" });
+        socket.emit("message", { content:`${user.id} has sent offer`, receiver: errand.poster, relatedUser:user.id, sender: "SYSTEM", type: "NOTIFICATION" });
+        socket.emit("message", { content:`${user.id} has sent offer`, receiver: user.id, relatedUser:errand.poster, sender: "SYSTEM", type: "NOTIFICATION" });
     };
 
     if (!errand) return (<div> loading...</div>);
