@@ -23,6 +23,12 @@ const messagesDao = {
         mysqlConn.query("update messages set isRead = 1 where (sender=? and receiver=?) or (receiver=? and relatedUser=?)",[othersId, myId, myId, othersId], (error, data) => {
             cb(error, data);
         });
+    },
+
+    getMessageById(id, cb){
+        mysqlConn.query("select * from messages where id = ?", id, (error, data) => {
+            cb(error, data);
+        });
     }
 };
 

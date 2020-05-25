@@ -3,8 +3,6 @@ import api from "../utils/api";
 import socket from "../utils/socket";
 function Offer({ message, user }) {
 
-    //todo : timeout
-
     const [offerState, setOfferState] = useState(null);
 
     const getCurrentState = useCallback(()=> {
@@ -19,7 +17,7 @@ function Offer({ message, user }) {
     }, [message, getCurrentState]);
 
     useEffect(()=>{
-        socket.on("state_changed",()=>getCurrentState())
+        socket.on("offer-state-changed",()=>getCurrentState())
     },[getCurrentState]);
 
     let buttons = document.getElementsByClassName("offer-control-btn");
@@ -31,67 +29,17 @@ function Offer({ message, user }) {
         }
     };
 
-    function notifyWidhdraw() {
-        socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
-        socket.emit("message", { content: `${user.id} has canceled offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
-    };
-
-    function notifyAccept() {
-        socket.emit("message", { content: `${user.id} has accepted offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
-        socket.emit("message", { content: `${user.id} has accepted offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
-    };
-
-    function notifyConfirm() {
-        socket.emit("message", { content: `${user.id} has confirmed offer`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
-        socket.emit("message", { content: `${user.id} has confirmed offer`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
-    };
-
-    function notifyErrandRunning() {
-        socket.emit("message", { content: `Now errand is in running mode`, receiver: message.receiver, relatedUser:message.sender, sender: "SYSTEM", type: "NOTIFICATION" });
-        socket.emit("message", { content: `Now errand is in running mode`, receiver: message.sender, relatedUser:message.receiver, sender: "SYSTEM", type: "NOTIFICATION" });
-    };
-
-    function withdrawOffer() {
+    function changeOfferState(new_state){
         disableButtons();
-        api.stateTransition.createNewTransition({ object_id: message.id, new_state: "canceled" }).then(res => {
-            if(res.status===200)
-                notifyWidhdraw();
-            // what to do if there is error?
-        });
-    };
-
-    function accecptOffer() {
-        disableButtons();
-        api.stateTransition.createNewTransition({ object_id: message.id, new_state: "accepted" }).then(res => {
-            if(res.status===200)
-                notifyAccept();
-        });
-    };
-
-    function confirmOffer() {
-        disableButtons();
-        api.stateTransition.createNewTransition({ object_id: message.id, new_state: "confirmed" }).then(res => {
-            if(res.status===200)
-                notifyConfirm();
-        });
-        api.stateTransition.createNewTransition({ object_id: message.errand, new_state: "running" }).then(res => {
-            if(res.status===200)
-            {
-                notifyErrandRunning();
-            }
-        });
-        api.errand.updateErrandToRunningMode({errand:message.errand, runner:user.id, fee:message.fee}).then(res=>{
-            // if errand has updated correctly
-            // maybe notifyErrandRunning here
-        })
+        socket.emit("offer-state-transition",{object_id: message.id, new_state})
     };
 
     if (offerState === "initial")
         return (
             <>
                 {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
-                {message.sender === user.id ? <button className="offer-control-btn" onClick={() => withdrawOffer()}>Withdraw</button> :
-                    <button className="offer-control-btn" onClick={() => accecptOffer()}>Accept</button>}
+                {message.sender === user.id ? <button className="offer-control-btn" onClick={() => changeOfferState("canceled")}>Withdraw</button> :
+                    <button className="offer-control-btn" onClick={() => changeOfferState("accepted")}>Accept</button>}
             </>
         );
 
@@ -100,8 +48,8 @@ function Offer({ message, user }) {
             <>
                 {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
                 {message.sender === user.id ? <div>
-                    <button className="offer-control-btn"  onClick={() => confirmOffer()}>Confirm</button>
-                    <button className="offer-control-btn"  onClick={() => withdrawOffer()}>WithDraw</button>
+                    <button className="offer-control-btn"  onClick={() => changeOfferState("confirmed")}>Confirm</button>
+                    <button className="offer-control-btn"  onClick={() => changeOfferState("canceled")}>WithDraw</button>
                 </div> : <></>}
             </>
         );
