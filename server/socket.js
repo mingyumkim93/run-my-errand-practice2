@@ -19,6 +19,39 @@ function getNotificationForPoster(offer, content) {
     };
 };
 
+function createNotifications(socket, offer, content, isRunner){
+    const notificationToRunner = getNotificationForRunner(offer, content);
+    const notificationToPoster = getNotificationForPoster(offer, content);
+    messageDao.createNewMessage(notificationToRunner, function(err, data){
+        if(err) console.log(err);
+        else{
+            //1:when runner sent offer 2:when runner canceled offer 3:when runner confirmed offer
+            if(isRunner){
+                socket.emit("message", notificationToRunner);
+                socket.emit("offer-state-changed");
+            }
+            //when poster accepted offer
+            else{
+                socket.broadcast.to(offer.sender).emit("message", notificationToRunner);
+                socket.broadcast.to(offer.sender).emit("offer-state-changed");
+            }
+        }
+    });
+    messageDao.createNewMessage(notificationToPoster, function(err, data){
+        if(err) console.log(err);
+        else{
+            if(isRunner){
+                socket.broadcast.to(offer.receiver).emit("message", notificationToPoster);
+                socket.broadcast.to(offer.receiver).emit("offer-state-changed", notificationToPoster);
+            }
+            else{
+                socket.emit("message",notificationToPoster);
+                socket.emit("offer-state-changed");
+            }
+        }
+    });
+};
+
 module.exports = function (server) {
     const io = require("socket.io").listen(server);
     io.on("connection", socket => {
@@ -31,47 +64,26 @@ module.exports = function (server) {
             messageDao.createNewMessage(message, function (err, data) {
                 if (err) socket.emit("message-error");
                 else {
-                    if (message.type === "NOTIFICATION") {
-                        if (socket.rooms[message.receiver])
-                            socket.emit("message", message); // emit to myself
-                        else
-                            socket.broadcast.to(message.receiver).emit("message", message); //emit to the other one
+                    //only chat and offer will be treated like this because there is no notification from client
+                    socket.emit("message", message);
+                    socket.broadcast.to(message.receiver).emit("message", message);
+                    if (message.type === "OFFER") {
+                        createNotifications(socket, message, "is sent", true);
+                        setTimeout(() => {
+                            stateTransitionDao.getCurrentState(message.id, function (err, data) {
+                                if (err) console.log("There was error fetching current state of offer");
+                                if (data.length === 0) {
+                                    const transition = { object_id: message.id, new_state: "canceled", timestamp: new Date() };
+                                    stateTransitionDao.createNewTransition(transition, function (err, data) {
+                                        if (err) console.log("There was error creating new state of offer");
+                                        else {
+                                            createNotifications(socket, message, "is canceled due to timeout", true);
+                                        };
+                                    });
+                                };
+                            });
+                        }, oneMinute);
                     }
-                    else {
-                        socket.emit("message", message);
-                        socket.broadcast.to(message.receiver).emit("message", message);
-                        if (message.type === "OFFER") {
-                            setTimeout(() => {
-                                stateTransitionDao.getCurrentState(message.id, function (err, data) {
-                                    if (err) console.log("There was error fetching current state of offer");
-                                    if (data.length === 0) {
-                                        const transition = { object_id: message.id, new_state: "canceled", timestamp: new Date() };
-                                        stateTransitionDao.createNewTransition(transition, function (err, data) {
-                                            if (err) console.log("There was error creating new state of offer");
-                                            else {
-                                                const timeoutNotificationToRunner = getNotificationForRunner(message, "is canceled due to timeout");
-                                                const timeoutNotificationToPoster = getNotificationForPoster(message, "is canceled due to timeout");
-                                                messageDao.createNewMessage(timeoutNotificationToRunner, function (err, data) {
-                                                    if (err) console.log("There was error creating new timout notification")
-                                                    else {
-                                                        socket.emit("message", timeoutNotificationToRunner);
-                                                        socket.emit("offer-state-changed");
-                                                    }
-                                                });
-                                                messageDao.createNewMessage(timeoutNotificationToPoster, function (err, data) {
-                                                    if (err) console.log("There was error creating new timout notification")
-                                                    else {
-                                                        socket.broadcast.to(message.receiver).emit("message", timeoutNotificationToPoster);
-                                                        socket.broadcast.to(message.receiver).emit("offer-state-changed");
-                                                    }
-                                                });
-                                            };
-                                        });
-                                    };
-                                });
-                            }, oneMinute)
-                        };
-                    };
                 };
             });
         });
@@ -89,38 +101,12 @@ module.exports = function (server) {
                         else {
                             if (new_state === "canceled") {
                                 //because it is runner who is cancelling this offer
-                                socket.emit("offer-state-changed");
-                                socket.broadcast.to(offer.receiver).emit("offer-state-changed");
-
-                                const cancelNotificationToRunner = getNotificationForRunner(offer, "is canceled");
-                                const cancelNotificationToPoster = getNotificationForPoster(offer, "is canceled");
-
-                                messageDao.createNewMessage(cancelNotificationToRunner, function (err, data) {
-                                    if (err) console.log("There was error creating cancel notification for runner")
-                                    else socket.emit("message", cancelNotificationToRunner);
-                                });
-                                messageDao.createNewMessage(cancelNotificationToPoster, function (err, data) {
-                                    if (err) console.log("There was error creating cancel notification for poster")
-                                    else socket.broadcast.to(offer.receiver).emit("message", cancelNotificationToPoster);
-                                });
+                                createNotifications(socket, offer, "is canceled", true);
                             }
                             else if (new_state === "accepted") {
                                 //because it is poster who is accepting this offer
-                                socket.emit("offer-state-changed");
-                                socket.broadcast.to(offer.sender).emit("offer-state-changed");
-
-                                const acceptNotificationToRunner = getNotificationForRunner(offer, "is accepted");
-                                const acceptNotificationToPoster = getNotificationForPoster(offer, "is accepted");
-
-                                messageDao.createNewMessage(acceptNotificationToRunner, function (err, data) {
-                                    if (err) console.log("There was error creating cancel notification for runner")
-                                    else socket.broadcast.to(offer.sender).emit("message", acceptNotificationToRunner);
-                                });
-                                messageDao.createNewMessage(acceptNotificationToPoster, function (err, data) {
-                                    if (err) console.log("There was error creating cancel notification for poster")
-                                    else socket.emit("message", acceptNotificationToPoster);
-                                });
-
+                                createNotifications(socket, offer, "is accepted", false);
+                        
                                 setTimeout(() => {
                                     stateTransitionDao.getCurrentState(object_id, function (err, data) {
                                         if (err) console.log("there was error on fetching current state of offer");
@@ -132,48 +118,18 @@ module.exports = function (server) {
                                                 stateTransitionDao.createNewTransition(transition, function (err, data) {
                                                     if (err) console.log("there was error on creating new state transition of offer");
                                                     else {
-                                                        const timeoutNotificationToRunner = getNotificationForRunner(offer, "is canceled due to timeout");
-                                                        const timeoutNotificationToPoster = getNotificationForPoster(offer, "is canceled due to timeout");
-
-                                                        messageDao.createNewMessage(timeoutNotificationToPoster, function (err, data) {
-                                                            if (err) console.log("There was error creating new timout notification for poster")
-                                                            else {
-                                                                socket.emit("message", timeoutNotificationToPoster);
-                                                                socket.emit("offer-state-changed");
-                                                            }
-                                                        });
-                                                        messageDao.createNewMessage(timeoutNotificationToRunner, function (err, data) {
-                                                            if (err) console.log("There was error creating new timout notification for runner")
-                                                            else {
-                                                                socket.broadcast.to(offer.sender).emit("message", timeoutNotificationToRunner);
-                                                                socket.broadcast.to(offer.sender).emit("offer-state-changed");
-                                                            }
-                                                        });
+                                                        createNotifications(socket, offer, "is canceled due to timeout", false);
                                                     };
                                                 });
                                             };
                                         };
                                     });
                                 }, oneMinute)
-
                             }
                             //new_state === confirmed
                             else {
                                 //because it's runenr who is confirming this offer
-                                socket.emit("offer-state-changed");
-                                socket.broadcast.to(offer.receiver).emit("offer-state-changed");
-
-                                const confirmNotificationToRunner = getNotificationForRunner(offer, "is confirmed");
-                                const confirmNotificationToPoster = getNotificationForPoster(offer, "is confirmed");
-
-                                messageDao.createNewMessage(confirmNotificationToRunner, function (err, data) {
-                                    if (err) console.log("There was error creating confirm notificaion to runner")
-                                    else socket.emit("message", confirmNotificationToRunner);
-                                });
-                                messageDao.createNewMessage(confirmNotificationToPoster, function (err, data) {
-                                    if (err) console.log("There was error creating confirm notificaion to poster")
-                                    else socket.broadcast.to(offer.receiver).emit("message", confirmNotificationToPoster);
-                                });
+                                createNotifications(socket, offer, "is confirmed", true);
                             };
                         };
                     });
