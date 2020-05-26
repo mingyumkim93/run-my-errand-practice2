@@ -29,6 +29,12 @@ const messagesDao = {
         mysqlConn.query("select * from messages where id = ?", id, (error, data) => {
             cb(error, data);
         });
+    },
+
+    getMessagesByType(type,cb){
+        mysqlConn.query("select * from messages where type = ?", type, (error, data) => {
+            cb(error, data);
+        });
     }
 };
 

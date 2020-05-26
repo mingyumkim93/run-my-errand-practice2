@@ -1,7 +1,7 @@
 const messageDao = require("./messagesDao");
 const stateTransitionDao = require("./statetransitiondao");
 const { uuid } = require("uuidv4");
-const tenSeconds = 1000 * 10;
+const oneMinute = 1000 * 60;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
 
@@ -23,7 +23,6 @@ module.exports = function (server) {
     const io = require("socket.io").listen(server);
     io.on("connection", socket => {
         console.log("New client connected", socket.id);
-        //todo : check messages and canceled out-dated offers  and notify it
         socket.on("disconnect", () => console.log("Client disconnected: ", socket.id));
         socket.on("error", () => console.log("Recieved error from client: ", socket.id));
         socket.on("join", (id) => socket.join(id));
@@ -70,7 +69,7 @@ module.exports = function (server) {
                                         });
                                     };
                                 });
-                            }, tenSeconds)
+                            }, oneMinute)
                         };
                     };
                 };
@@ -155,7 +154,7 @@ module.exports = function (server) {
                                             };
                                         };
                                     });
-                                }, tenSeconds)
+                                }, oneMinute)
 
                             }
                             //new_state === confirmed
