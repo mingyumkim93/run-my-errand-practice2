@@ -22,7 +22,7 @@ module.exports = function (app) {
     });
 
     passport.deserializeUser(function (id, done) {
-        console.log("deserialized user id: ", id);
+        // console.log("deserialized user id: ", id);
         userDao.getUserById(id, function (error, data) {
             const user = data[0];
             if (error) console.log("Error happened on querying an user") 

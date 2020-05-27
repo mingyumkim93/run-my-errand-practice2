@@ -8,14 +8,14 @@ const NOTIFICATION = "NOTIFICATION";
 function getNotificationForRunner(offer, content) {
     return {
         id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.sender, relatedUser: offer.receiver,
-        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
+        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content + "Runner"
     };
 };
 
 function getNotificationForPoster(offer, content) {
     return {
         id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.receiver, relatedUser: offer.sender,
-        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
+        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content + "Poster"
     };
 };
 
@@ -52,6 +52,31 @@ function createNotifications(socket, offer, content, isRunner){
     });
 };
 
+function setStateCheckTimeout(socket,offer){
+    setTimeout(()=>{
+        stateTransitionDao.getCurrentState(offer.id, function(err, data){
+            if(err) console.log(err);
+            else{
+                //if data===[]  >> no transition at all >> still initial state
+                if(!data[0])createCanceledStateTransition(socket, offer, true);
+                //if there has been some state transition since the offer was created
+                else{
+                    //WHY THE HELL THIS SHOULD BE ISRUNNER TRUE???!
+                    if(data[0].new_state === "accepted")createCanceledStateTransition(socket, offer, true);
+                }
+            }
+        });
+    }, 10 * 1000);
+};
+
+function createCanceledStateTransition(socket, offer, isRunner){
+    const transition = {object_id:offer.id, new_state:"canceled", timestamp:new Date()}
+    stateTransitionDao.createNewTransition(transition, function(err, data){
+        if(err) console.log(err);
+        else createNotifications(socket, offer, "is canceled due to timeout", isRunner);
+    });
+};
+
 module.exports = function (server) {
     const io = require("socket.io").listen(server);
     io.on("connection", socket => {
@@ -64,73 +89,34 @@ module.exports = function (server) {
             messageDao.createNewMessage(message, function (err, data) {
                 if (err) socket.emit("message-error");
                 else {
-                    //only chat and offer will be treated like this because there is no notification from client
+                    //only chat and offer will be emited like this because there is no notification coming from client
                     socket.emit("message", message);
                     socket.broadcast.to(message.receiver).emit("message", message);
                     if (message.type === "OFFER") {
                         createNotifications(socket, message, "is sent", true);
-                        setTimeout(() => {
-                            stateTransitionDao.getCurrentState(message.id, function (err, data) {
-                                if (err) console.log("There was error fetching current state of offer");
-                                if (data.length === 0) {
-                                    const transition = { object_id: message.id, new_state: "canceled", timestamp: new Date() };
-                                    stateTransitionDao.createNewTransition(transition, function (err, data) {
-                                        if (err) console.log("There was error creating new state of offer");
-                                        else {
-                                            createNotifications(socket, message, "is canceled due to timeout", true);
-                                        };
-                                    });
-                                };
-                            });
-                        }, oneMinute);
+                        setStateCheckTimeout(socket, message);
                     }
                 };
             });
         });
         socket.on("offer-state-transition", (payload) => {
-            //todo : validaion, create new errand state transition when offer is confirmed && this event happen when server is initialized
+            //todo : validaion, create new errand state transition when offer is confirmed
             const object_id = payload.object_id;
             const new_state = payload.new_state;
             const transition = { object_id, new_state, timestamp: new Date() };
             stateTransitionDao.createNewTransition(transition, function (err, data) {
-                if (err) console.log("there was error on creating new state transition of offer");
+                if (err) console.log(err);
                 else {
                     messageDao.getMessageById(object_id, function (err, data) {
                         const offer = data[0];
-                        if (err) console.log("ther was error on fetching offer by id");
+                        if (err) console.log(err);
                         else {
-                            if (new_state === "canceled") {
-                                //because it is runner who is cancelling this offer
-                                createNotifications(socket, offer, "is canceled", true);
-                            }
+                            if (new_state === "canceled") createNotifications(socket, offer, "is canceled", true);
                             else if (new_state === "accepted") {
-                                //because it is poster who is accepting this offer
                                 createNotifications(socket, offer, "is accepted", false);
-                        
-                                setTimeout(() => {
-                                    stateTransitionDao.getCurrentState(object_id, function (err, data) {
-                                        if (err) console.log("there was error on fetching current state of offer");
-                                        //because there was already new transition, I don't care empty data here
-                                        else {
-                                            //if it's still "accepted" state
-                                            if (data[0].new_state === new_state) {
-                                                const transition = { object_id, new_state: "canceled", timestamp: new Date() };
-                                                stateTransitionDao.createNewTransition(transition, function (err, data) {
-                                                    if (err) console.log("there was error on creating new state transition of offer");
-                                                    else {
-                                                        createNotifications(socket, offer, "is canceled due to timeout", false);
-                                                    };
-                                                });
-                                            };
-                                        };
-                                    });
-                                }, oneMinute)
+                                setStateCheckTimeout(socket, offer);
                             }
-                            //new_state === confirmed
-                            else {
-                                //because it's runenr who is confirming this offer
-                                createNotifications(socket, offer, "is confirmed", true);
-                            };
+                            else createNotifications(socket, offer, "is confirmed", true);
                         };
                     });
                 };

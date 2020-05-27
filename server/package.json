@@ -4,7 +4,8 @@
   "scripts": {
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
-    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+    "debug": "node --nolazy --inspect-brk=9229 server.js"
   },
   "dependencies": {
     "bcrypt": "^4.0.1",
