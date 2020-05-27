@@ -8,72 +8,57 @@ const NOTIFICATION = "NOTIFICATION";
 function getNotificationForRunner(offer, content) {
     return {
         id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.sender, relatedUser: offer.receiver,
-        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content + "Runner"
+        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
     };
 };
 
 function getNotificationForPoster(offer, content) {
     return {
         id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.receiver, relatedUser: offer.sender,
-        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content + "Poster"
+        type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
     };
 };
 
-function createNotifications(socket, offer, content, isRunner){
+function createNotifications(io, offer, content) {
     const notificationToRunner = getNotificationForRunner(offer, content);
     const notificationToPoster = getNotificationForPoster(offer, content);
-    messageDao.createNewMessage(notificationToRunner, function(err, data){
-        if(err) console.log(err);
-        else{
-            //1:when runner sent offer 2:when runner canceled offer 3:when runner confirmed offer
-            if(isRunner){
-                socket.emit("message", notificationToRunner);
-                socket.emit("offer-state-changed");
-            }
-            //when poster accepted offer
-            else{
-                socket.broadcast.to(offer.sender).emit("message", notificationToRunner);
-                socket.broadcast.to(offer.sender).emit("offer-state-changed");
-            }
+    messageDao.createNewMessage(notificationToRunner, function (err, data) {
+        if (err) console.log(err);
+        else {
+            io.in(notificationToRunner.receiver).emit("message", notificationToRunner);
+            io.in(notificationToRunner.receiver).emit("offer-state-changed");
         }
     });
-    messageDao.createNewMessage(notificationToPoster, function(err, data){
-        if(err) console.log(err);
-        else{
-            if(isRunner){
-                socket.broadcast.to(offer.receiver).emit("message", notificationToPoster);
-                socket.broadcast.to(offer.receiver).emit("offer-state-changed", notificationToPoster);
-            }
-            else{
-                socket.emit("message",notificationToPoster);
-                socket.emit("offer-state-changed");
-            }
+    messageDao.createNewMessage(notificationToPoster, function (err, data) {
+        if (err) console.log(err);
+        else {
+            io.in(notificationToPoster.receiver).emit("message", notificationToPoster);
+            io.in(notificationToPoster.receiver).emit("offer-state-changed");
         }
     });
 };
 
-function setStateCheckTimeout(socket,offer){
-    setTimeout(()=>{
-        stateTransitionDao.getCurrentState(offer.id, function(err, data){
-            if(err) console.log(err);
-            else{
+function setStateCheckTimeout(io, offer) {
+    setTimeout(() => {
+        stateTransitionDao.getCurrentState(offer.id, function (err, data) {
+            if (err) console.log(err);
+            else {
                 //if data===[]  >> no transition at all >> still initial state
-                if(!data[0])createCanceledStateTransition(socket, offer, true);
+                if (!data[0]) createCanceledStateTransition(io, offer);
                 //if there has been some state transition since the offer was created
-                else{
-                    //WHY THE HELL THIS SHOULD BE ISRUNNER TRUE???!
-                    if(data[0].new_state === "accepted")createCanceledStateTransition(socket, offer, true);
+                else {
+                    if (data[0].new_state === "accepted") createCanceledStateTransition(io, offer);
                 }
             }
         });
-    }, 10 * 1000);
+    }, oneMinute);
 };
 
-function createCanceledStateTransition(socket, offer, isRunner){
-    const transition = {object_id:offer.id, new_state:"canceled", timestamp:new Date()}
-    stateTransitionDao.createNewTransition(transition, function(err, data){
-        if(err) console.log(err);
-        else createNotifications(socket, offer, "is canceled due to timeout", isRunner);
+function createCanceledStateTransition(io, offer) {
+    const transition = { object_id: offer.id, new_state: "canceled", timestamp: new Date() }
+    stateTransitionDao.createNewTransition(transition, function (err, data) {
+        if (err) console.log(err);
+        else createNotifications(io, offer, "is canceled due to timeout");
     });
 };
 
@@ -90,11 +75,11 @@ module.exports = function (server) {
                 if (err) socket.emit("message-error");
                 else {
                     //only chat and offer will be emited like this because there is no notification coming from client
-                    socket.emit("message", message);
-                    socket.broadcast.to(message.receiver).emit("message", message);
+                    io.in(message.receiver).emit("message", message);
+                    io.in(message.sender).emit("message", message);
                     if (message.type === "OFFER") {
-                        createNotifications(socket, message, "is sent", true);
-                        setStateCheckTimeout(socket, message);
+                        createNotifications(io, message, "is sent");
+                        setStateCheckTimeout(io, message);
                     }
                 };
             });
@@ -111,12 +96,12 @@ module.exports = function (server) {
                         const offer = data[0];
                         if (err) console.log(err);
                         else {
-                            if (new_state === "canceled") createNotifications(socket, offer, "is canceled", true);
+                            if (new_state === "canceled") createNotifications(io, offer, "is canceled");
                             else if (new_state === "accepted") {
-                                createNotifications(socket, offer, "is accepted", false);
-                                setStateCheckTimeout(socket, offer);
+                                createNotifications(io, offer, "is accepted");
+                                setStateCheckTimeout(io, offer);
                             }
-                            else createNotifications(socket, offer, "is confirmed", true);
+                            else createNotifications(io, offer, "is confirmed");
                         };
                     });
                 };
