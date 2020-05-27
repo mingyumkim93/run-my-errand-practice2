@@ -1,7 +1,7 @@
 const messageDao = require("./messagesDao");
 const stateTransitionDao = require("./statetransitiondao");
 const { uuid } = require("uuidv4");
-const tenSeconds = 1000 * 10;
+const twentySeconds = 1000 * 20;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
 let timersForOffer = {};
@@ -43,22 +43,21 @@ function setStateCheckTimeout(io, offer, lastTransitionTimestamp = undefined) {
     clearTimeout(timersForOffer[offer.id]);
     delete timersForOffer[offer.id];
     timersForOffer = {...timersForOffer, [offer.id] : setTimeout(() => {
-        console.log("time out!!!");
         stateTransitionDao.getCurrentState(offer.id, function (err, data) {
             if (err) console.log(err);
             else {
                 //if data===[]  >> no transition at all >> still initial state
-                if (!data[0]) createCanceledStateTransition(io, offer);
+                if (!data[0]) createCanceledOfferStateTransition(io, offer);
                 //if there has been some state transition since the offer was created
                 else {
-                    if (data[0].new_state === "accepted") createCanceledStateTransition(io, offer);
+                    if (data[0].new_state === "accepted") createCanceledOfferStateTransition(io, offer);
                 } 
             }
         });
-    }, lastTransitionTimestamp? lastTransitionTimestamp - new Date() + tenSeconds : offer.createdAt - new Date() + tenSeconds)};
+    }, lastTransitionTimestamp? lastTransitionTimestamp - new Date() + twentySeconds : offer.createdAt - new Date() + twentySeconds)};
 };
 
-function createCanceledStateTransition(io, offer) {
+function createCanceledOfferStateTransition(io, offer) {
     const transition = { object_id: offer.id, new_state: "canceled", timestamp: new Date() }
     stateTransitionDao.createNewTransition(transition, function (err, data) {
         if (err) console.log(err);
@@ -77,8 +76,8 @@ function initialCheckForTimeoutOffer(io){
                         //if initial state
                         if(data.length === 0){
                             //if timeout
-                            if(new Date() - offer.createdAt > tenSeconds){
-                                createCanceledStateTransition(io, offer);
+                            if(new Date() - offer.createdAt > twentySeconds){
+                                createCanceledOfferStateTransition(io, offer);
                             }
                             //not timeout yet
                             else{
@@ -89,8 +88,8 @@ function initialCheckForTimeoutOffer(io){
                         else{
                             if(data[0].new_state === "accepted"){
                                 //if timeout
-                                if(new Date() - data[0].timestamp > tenSeconds){
-                                    createCanceledStateTransition(io, offer);
+                                if(new Date() - data[0].timestamp > twentySeconds){
+                                    createCanceledOfferStateTransition(io, offer);
                                 }
                                 else{
                                     setStateCheckTimeout(io, offer, data[0].timestamp);
@@ -101,6 +100,27 @@ function initialCheckForTimeoutOffer(io){
                 });
             });
         }
+    });
+};
+
+function createNewOfferStateTransition(io, object_id, new_state){
+    const transition = {object_id, new_state, timestamp: new Date()};
+    stateTransitionDao.createNewTransition(transition, function (err, data) {
+        if (err) console.log(err);
+        else {
+            messageDao.getMessageById(object_id, function (err, data) {
+                const offer = data[0];
+                if (err) console.log(err);
+                else {
+                    if (new_state === "canceled") createNotifications(io, offer, "is canceled");
+                    else if (new_state === "accepted") {
+                        createNotifications(io, offer, "is accepted");
+                        setStateCheckTimeout(io, offer, new Date());
+                    }
+                    else createNotifications(io, offer, "is confirmed");
+                };
+            });
+        };
     });
 };
 
@@ -128,31 +148,43 @@ module.exports = function (server) {
             });
         });
         socket.on("offer-state-transition", (payload) => {
-            //todo : validaion, create new errand state transition when offer is confirmed
+            //todo : create new errand state transition when offer is confirmed
             const object_id = payload.object_id;
             const new_state = payload.new_state;
-            // get current state
-            // if canceled >> no transition allowed
-            // if accepted >> only cancel or confirm
-            // if confirmed >> no transition allowed
-            // if initial >> cancel or accepted allowed
-            const transition = { object_id, new_state, timestamp: new Date() };
-            stateTransitionDao.createNewTransition(transition, function (err, data) {
-                if (err) console.log(err);
-                else {
-                    messageDao.getMessageById(object_id, function (err, data) {
-                        const offer = data[0];
-                        if (err) console.log(err);
-                        else {
-                            if (new_state === "canceled") createNotifications(io, offer, "is canceled");
-                            else if (new_state === "accepted") {
-                                createNotifications(io, offer, "is accepted");
-                                setStateCheckTimeout(io, offer, new Date());
+            let currentState = "initial";
+            stateTransitionDao.getCurrentState(object_id, function(err, data){
+                if(err) console.log(err);
+                else{
+                    if(data[0]) currentState = data[0].new_state; 
+                    switch(currentState){
+                        case "canceled":{
+                            socket.emit("not-allowed-offer-state-transition");
+                            break;
+                        }
+                        case "initial":{
+                            if(new_state === "canceled" || new_state === "accepted"){
+                                createNewOfferStateTransition(io,object_id,new_state);
                             }
-                            else createNotifications(io, offer, "is confirmed");
-                        };
-                    });
-                };
+                            else socket.emit("not-allowed-offer-state-transition");
+                            break;
+                        }
+                        case "accepted":{
+                            if(new_state === "canceled" || new_state === "confirmed"){
+                                createNewOfferStateTransition(io,object_id,new_state);
+                            }
+                            else socket.emit("not-allowed-offer-state-transition");
+                            break;
+                        }
+                        case "confirmed":{
+                            socket.emit("not-allowed-offer-state-transition");
+                            break;
+                        }
+                        default:{
+                            socket.emit("not-allowed-offer-state-transition");
+                            break;
+                        }
+                    }
+                }
             });
         });
     });

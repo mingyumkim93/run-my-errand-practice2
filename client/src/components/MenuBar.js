@@ -29,8 +29,9 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
   useEffect(() => {
     if (user && addMessage) {
       socket.emit("join", user.id);
-      socket.on("message", (message) => {console.log("new message",message);addMessage(message)});
+      socket.on("message", (message) => addMessage(message));
       socket.on("message-error", () => alert("something went wrong with message"));
+      socket.on("not-allowed-offer-state-transition", () => alert("Not allowed that offer state transition!"))
     }
   }, [user, addMessage]);
 
