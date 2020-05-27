@@ -4,6 +4,7 @@ const { uuid } = require("uuidv4");
 const tenSeconds = 1000 * 10;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
+let timersForOffer = {};
 
 function getNotificationForRunner(offer, content) {
     return {
@@ -38,8 +39,11 @@ function createNotifications(io, offer, content) {
     });
 };
 
-function setStateCheckTimeout(io, offer) {
-    setTimeout(() => {
+function setStateCheckTimeout(io, offer, lastTransitionTimestamp = undefined) {
+    clearTimeout(timersForOffer[offer.id]);
+    delete timersForOffer[offer.id];
+    timersForOffer = {...timersForOffer, [offer.id] : setTimeout(() => {
+        console.log("time out!!!");
         stateTransitionDao.getCurrentState(offer.id, function (err, data) {
             if (err) console.log(err);
             else {
@@ -48,10 +52,10 @@ function setStateCheckTimeout(io, offer) {
                 //if there has been some state transition since the offer was created
                 else {
                     if (data[0].new_state === "accepted") createCanceledStateTransition(io, offer);
-                }
+                } 
             }
         });
-    }, new Date() - offer.createdAt + tenSeconds);
+    }, lastTransitionTimestamp? lastTransitionTimestamp - new Date() + tenSeconds : offer.createdAt - new Date() + tenSeconds)};
 };
 
 function createCanceledStateTransition(io, offer) {
@@ -89,7 +93,7 @@ function initialCheckForTimeoutOffer(io){
                                     createCanceledStateTransition(io, offer);
                                 }
                                 else{
-                                    setStateCheckTimeout(io, offer);
+                                    setStateCheckTimeout(io, offer, data[0].timestamp);
                                 }
                             }
                         }
@@ -100,7 +104,6 @@ function initialCheckForTimeoutOffer(io){
     });
 };
 
-//TODO : set timeout when offer changed before timeout
 module.exports = function (server) {
     const io = require("socket.io").listen(server);
     initialCheckForTimeoutOffer(io);
@@ -114,7 +117,7 @@ module.exports = function (server) {
             messageDao.createNewMessage(message, function (err, data) {
                 if (err) socket.emit("message-error");
                 else {
-                    //only chat and offer will be emited like this because there is no notification coming from client
+                    //only chat and offer will be emited like this because there is no notification coming from client side
                     io.in(message.receiver).emit("message", message);
                     io.in(message.sender).emit("message", message);
                     if (message.type === "OFFER") {
@@ -128,6 +131,11 @@ module.exports = function (server) {
             //todo : validaion, create new errand state transition when offer is confirmed
             const object_id = payload.object_id;
             const new_state = payload.new_state;
+            // get current state
+            // if canceled >> no transition allowed
+            // if accepted >> only cancel or confirm
+            // if confirmed >> no transition allowed
+            // if initial >> cancel or accepted allowed
             const transition = { object_id, new_state, timestamp: new Date() };
             stateTransitionDao.createNewTransition(transition, function (err, data) {
                 if (err) console.log(err);
@@ -139,7 +147,7 @@ module.exports = function (server) {
                             if (new_state === "canceled") createNotifications(io, offer, "is canceled");
                             else if (new_state === "accepted") {
                                 createNotifications(io, offer, "is accepted");
-                                setStateCheckTimeout(io, offer);
+                                setStateCheckTimeout(io, offer, new Date());
                             }
                             else createNotifications(io, offer, "is confirmed");
                         };
