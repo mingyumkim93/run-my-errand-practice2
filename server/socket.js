@@ -1,7 +1,7 @@
 const messageDao = require("./messagesDao");
 const stateTransitionDao = require("./statetransitiondao");
 const { uuid } = require("uuidv4");
-const oneMinute = 1000 * 60;
+const tenSeconds = 1000 * 10;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
 
@@ -51,7 +51,7 @@ function setStateCheckTimeout(io, offer) {
                 }
             }
         });
-    }, oneMinute);
+    }, new Date() - offer.createdAt + tenSeconds);
 };
 
 function createCanceledStateTransition(io, offer) {
@@ -62,8 +62,48 @@ function createCanceledStateTransition(io, offer) {
     });
 };
 
+function initialCheckForTimeoutOffer(io){
+    messageDao.getMessagesByType("OFFER", function(err,data){
+        if(err) console.log(err);
+        else{
+            data.forEach(offer => {
+                stateTransitionDao.getCurrentState(offer.id, function(err,data){
+                    if(err) console.log(err);
+                    else{
+                        //if initial state
+                        if(data.length === 0){
+                            //if timeout
+                            if(new Date() - offer.createdAt > tenSeconds){
+                                createCanceledStateTransition(io, offer);
+                            }
+                            //not timeout yet
+                            else{
+                                setStateCheckTimeout(io, offer);
+                            }
+                        }
+                        //not initial state (canceled, accepted, confirmed)
+                        else{
+                            if(data[0].new_state === "accepted"){
+                                //if timeout
+                                if(new Date() - data[0].timestamp > tenSeconds){
+                                    createCanceledStateTransition(io, offer);
+                                }
+                                else{
+                                    setStateCheckTimeout(io, offer);
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    });
+};
+
+//TODO : set timeout when offer changed before timeout
 module.exports = function (server) {
     const io = require("socket.io").listen(server);
+    initialCheckForTimeoutOffer(io);
     io.on("connection", socket => {
         console.log("New client connected", socket.id);
         socket.on("disconnect", () => console.log("Client disconnected: ", socket.id));
