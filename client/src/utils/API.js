@@ -28,11 +28,8 @@ export default {
         fetchAErrand(payload) {
             return axios.get(payload);
         },
-        fetchErrandsIRun(payload) {
-            return axios.get("/fetch-myrun", { params: { id: payload } });
-        },
-        fetchErrandsIPost(payload) {
-            return axios.get("/fetch-mypost", { params: { id: payload } });
+        fetchMyErrands(payload) {
+            return axios.get("/fetch-my-errands", { params: { id: payload } });
         }
     },
     message: {

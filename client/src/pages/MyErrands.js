@@ -4,15 +4,13 @@ import { connect } from "react-redux";
 
 function MyErrands({user}){
 
-    const [myErrandsRun, setMyErrandsRun] = useState(null);
-    const [myErandsPost, setMyErrandsPost] = useState(null);
+    const [myErrands, setMyErrands] = useState(null);
     const [tab, setTab] = useState("post");
 
     useEffect(()=>{
         if(user)
         {
-            api.errand.fetchErrandsIPost(user.id).then(res=>setMyErrandsPost(res.data));
-            api.errand.fetchErrandsIRun(user.id).then(res=>setMyErrandsRun(res.data));
+            api.errand.fetchMyErrands(user.id).then(res => setMyErrands(res));
         }
     },[user]);
 
@@ -23,8 +21,7 @@ function MyErrands({user}){
                 if(tab === "post") setTab("run")
                 else setTab("post")
             }}>{tab}</button> 
-            {tab === "post" ? (myErandsPost && myErandsPost.map(errand => <div key={errand.id}>{errand.id}<button>Cancel</button><button>Confirm</button></div>)) : 
-                              (myErrandsRun && myErrandsRun.map(errand => <div key={errand.id}>{errand.id}<button>Cancel</button><button>Done</button></div>))}
+            <button onClick={()=>console.log(myErrands)}>see my errands</button>
         </>
     );
 };

@@ -1,5 +1,4 @@
 const mysqlConn = require("./mysqlhelper");
-
 const errandDao = {
 
     getAllErrands(cb){
@@ -26,17 +25,9 @@ const errandDao = {
         });
     },
 
-    getErrandsIPost(id, cb){
-        mysqlConn.query("select * from errands where poster = ?", id, (error, data) => {
-            cb(error, data);
-        });
-    },
-
-    getErrandsIRun(id, cb){
-        mysqlConn.query("select * from errands where runner = ?", id, (error, data) => {
-            cb(error, data);
-        });
-    },
+    getMyErrands(id){
+        
+    }
 }
 
 module.exports = errandDao;
