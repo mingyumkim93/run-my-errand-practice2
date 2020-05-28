@@ -28,9 +28,6 @@ export default {
         fetchAErrand(payload) {
             return axios.get(payload);
         },
-        updateErrandToRunningMode(payload) {
-            return axios.put("/errand/:id", payload)
-        },
         fetchErrandsIRun(payload) {
             return axios.get("/fetch-myrun", { params: { id: payload } });
         },

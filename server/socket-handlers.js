@@ -1,5 +1,6 @@
 const messageDao = require("./messagesDao");
 const stateTransitionDao = require("./statetransitiondao");
+const errandDao = require("./errandsdao");
 const tenSeconds = 1000 * 10;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
@@ -67,23 +68,26 @@ function createCanceledOfferStateTransition(io, offer) {
     });
 };
 
-function createNewOfferStateTransition(io, object_id, new_state) {
+function createNewStateTransition(io, object_id, new_state, isOffer = true) {
     const transition = { object_id, new_state, timestamp: new Date() };
     stateTransitionDao.createNewTransition(transition, function (err, data) {
         if (err) console.log(err);
         else {
-            messageDao.getMessageById(object_id, function (err, data) {
-                const offer = data[0];
-                if (err) console.log(err);
-                else {
-                    if (new_state === "canceled") createNotifications(io, offer, "is canceled");
-                    else if (new_state === "accepted") {
-                        createNotifications(io, offer, "is accepted");
-                        setStateCheckTimeout(io, offer, new Date());
-                    }
-                    else createNotifications(io, offer, "is confirmed");
-                };
-            });
+            if(isOffer){
+                messageDao.getMessageById(object_id, function (err, data) {
+                    const offer = data[0];
+                    if (err) console.log(err);
+                    else {
+                        if (new_state === "canceled") createNotifications(io, offer, "is canceled");
+                        else if (new_state === "accepted") {
+                            createNotifications(io, offer, "is accepted");
+                            setStateCheckTimeout(io, offer, new Date());
+                            // where to update errand fee ?
+                        }
+                        else createNotifications(io, offer, "is confirmed");
+                    };
+                });
+            }
         };
     });
 };
@@ -119,14 +123,29 @@ function offerStateChangeHandler(io, socket, payload) {
                 }
                 case "initial": {
                     if (new_state === "canceled" || new_state === "accepted") {
-                        createNewOfferStateTransition(io, object_id, new_state);
+                        createNewStateTransition(io, object_id, new_state);
                     }
                     else socket.emit("not-allowed-offer-state-transition");
                     break;
                 }
                 case "accepted": {
                     if (new_state === "canceled" || new_state === "confirmed") {
-                        createNewOfferStateTransition(io, object_id, new_state);
+                        createNewStateTransition(io, object_id, new_state);
+                        if(new_state === "confirmed"){
+                            messageDao.getMessageById(object_id, function(err, data){
+                                if(err) console.log(err);
+                                if(data.length > 0){
+                                    createNewStateTransition(io, data[0].errand, "running", false);
+                                    errandDao.updateToRunningState(data[0].errand, data[0].sender, data[0].fee, function(err, data){
+                                        if(err) console.log(err);
+                                        //if errand row is updated successfully .. what should I do here?
+                                        else{
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                     else socket.emit("not-allowed-offer-state-transition");
                     break;

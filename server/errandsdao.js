@@ -20,7 +20,7 @@ const errandDao = {
         });
     },
 
-    updateToRunningMode(errand, runner, fee, cb){
+    updateToRunningState(errand, runner, fee, cb){
         mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand], (error, data) => {
             cb(error, data);
         });

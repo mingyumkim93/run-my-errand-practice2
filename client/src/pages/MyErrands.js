@@ -23,8 +23,8 @@ function MyErrands({user}){
                 if(tab === "post") setTab("run")
                 else setTab("post")
             }}>{tab}</button> 
-            {tab === "post" ? (myErandsPost && myErandsPost.map(errand => <div key={errand.id}>{errand.id}</div>)) : 
-                              (myErrandsRun && myErrandsRun.map(errand => <div key={errand.id}>{errand.id}</div>))}
+            {tab === "post" ? (myErandsPost && myErandsPost.map(errand => <div key={errand.id}>{errand.id}<button>Cancel</button><button>Confirm</button></div>)) : 
+                              (myErrandsRun && myErrandsRun.map(errand => <div key={errand.id}>{errand.id}<button>Cancel</button><button>Done</button></div>))}
         </>
     );
 };

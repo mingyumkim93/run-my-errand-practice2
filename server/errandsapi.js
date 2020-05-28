@@ -25,13 +25,6 @@ module.exports = function (app) {
         });
     });
 
-    app.put("/errand/:id", (req,res) => {
-        errandDao.updateToRunningMode(req.body.errand, req.body.runner, req.body.fee, function(err, data){
-            if(err) res.send(err);
-            else res.send(data);
-        });
-    });
-
     app.get("/fetch-mypost", (req,res) => {
         errandDao.getErrandsIPost(req.query.id, function(err, data){
             if(err) res.send(err);
