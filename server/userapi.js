@@ -18,10 +18,9 @@ async function hashPassword(req, res) {
 
 module.exports = function (app) {
         app.post("/auth/signup", (req, res) => {
-            userDao.getUserByEmail(req.body.email, function(err, data){
-                if(err) res.send(err);
+            userDao.getUserByEmail(req.body.email).then(data => {
                 if(data[0]) res.send(404);
-                else{ //there is no same existing email in db
+                else{
                     hashPassword(req, res).then(hashedPassword=>{
                         req.body.password = hashedPassword;
                         req.body.createdAt = new Date();
@@ -33,13 +32,10 @@ module.exports = function (app) {
                         });
                     });
                 }
-            });
+            }).catch(err => res.send(err));
         });
 
         app.get("/auth/getFullNameById", (req, res) => {
-            userDao.getUserById(req.query.id, function(err, data){
-                if(err) res.send(err);
-                else {res.send(data)}
-            });
+            userDao.getUserById(req.query.id).then(data => res.send(data)).catch(err => console.log(err));
         });
 };

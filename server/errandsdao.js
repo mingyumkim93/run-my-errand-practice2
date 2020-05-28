@@ -1,32 +1,24 @@
 const mysqlConn = require("./mysqlhelper");
 const errandDao = {
 
-    getAllErrands(cb){
-        mysqlConn.query("select * from errands", (error, data) => {
-            cb(error, data);
-        });
+    getAllErrands(){
+        return mysqlConn.query("select * from errands");
     },
 
-    createNewErrand(errand,cb){
-        mysqlConn.query("insert into errands set ?", errand, (error, data) => {
-            cb(error, data);
-        });
+    createNewErrand(errand){
+        return mysqlConn.query("insert into errands set ?", errand);
     },
 
-    getErrandById(id,cb){
-        mysqlConn.query("select * from errands where id = ?", id, (error, data) => {
-            cb(error, data);
-        });
+    getErrandById(id){
+        return mysqlConn.query("select * from errands where id = ?", id);
     },
 
-    updateToRunningState(errand, runner, fee, cb){
-        mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand], (error, data) => {
-            cb(error, data);
-        });
+    updateToRunningState(errand, runner, fee){
+        return mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand]);
     },
 
     getMyErrands(id){
-        
+        return mysqlConn.query("select * from errands where runner = ? or poster = ?", [id, id]);
     }
 }
 

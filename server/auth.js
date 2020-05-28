@@ -23,22 +23,19 @@ module.exports = function (app) {
 
     passport.deserializeUser(function (id, done) {
         // console.log("deserialized user id: ", id);
-        userDao.getUserById(id, function (error, data) {
-            const user = data[0];
-            if (error) console.log("Error happened on querying an user") 
-            done(null, user)
-        });
+        userDao.getUserById(id).then(data => done(null, data[0])).catch(err => console.log(err));
     });
 
     passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, function (email, password, done) {
-        userDao.getUserByEmail(email, function (err, data) {
+        userDao.getUserByEmail(email)
+        .then(data => {
             const user = data[0];
-            if (err) return done(err);
-            if (!user) return done(null, false);
+            if(!user) return done(null, false);
             if (!bcrypt.compareSync(password, user.password)) return done(null, false);
             delete user.password;
             return done(null, user); //login success
-        });
+        })
+        .catch(err => {return done(err)});
     }))
 
     passport.use(new GoogleStrategy({
@@ -55,12 +52,15 @@ module.exports = function (app) {
             id: uuid()
         };
 
-        userDao.getUserByEmail(profile.email, function (error, data) {
-            if (data[0]) {delete data[0].password; done(null, data[0]);}
-            else userDao.createNewUser(user, function (error, data) {
-                done(null, user);
-            });
-        })
+        userDao.getUserByEmail(profile.email).then(data => {
+            if(data[0]) {
+                delete data[0].password; 
+                done(null, data[0]);
+            }
+            else{
+                userDao.createNewUser(user).then(data => done(null, user)).catch(err => console.log(err));
+            }
+        });
     }));
 
     app.get("/auth/google", passport.authenticate("google", {

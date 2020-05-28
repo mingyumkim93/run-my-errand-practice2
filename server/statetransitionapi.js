@@ -3,10 +3,7 @@ const stateTransitionDao = require("./statetransitiondao");
 module.exports = function (app) {
 
     app.get("/state-transition", (req, res) => {
-        stateTransitionDao.getCurrentState(req.query.id, function(err, data){
-            if(err) res.send(err);
-            else res.send(data);
-        });
+        stateTransitionDao.getCurrentState(req.query.id).then(data => res.send(data)).catch(err => res.send(err));
     });
 };
 
