@@ -21,7 +21,7 @@ function Message({ user, sortedMessages, readMessages }) {
     }, [messagesWithThisUser, user, readMessages]);
 
     function sendMessage() {
-        socket.emit("message", { content: messageInput, receiver: window.location.pathname.split("/")[2], sender: user.id, type:"CHAT" });
+        socket.emit("message", { content: messageInput, receiver_id: window.location.pathname.split("/")[2], sender_id: user.id, type:"CHAT" });
         setMessageInput("");
     };
 
@@ -29,7 +29,7 @@ function Message({ user, sortedMessages, readMessages }) {
         <div>
             {messagesWithThisUser && messagesWithThisUser.map(message =>
                 message.type === "NOTIFICATION" ? <div key={message.id} style={{color:"red"}}>{message.content}</div> :
-                message.type === "CHAT" ? <div key={message.id}>{message.sender} : {message.content} {message.createdAt}</div> : 
+                message.type === "CHAT" ? <div key={message.id}>{message.sender_id} : {message.content} {message.timestamp}</div> : 
                 message.type === "OFFER"? <Offer key={message.id} message={message} user={user}/> : <div>Unknown Message!</div>
             )} 
             <input autoFocus value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && e.target.value !== "") sendMessage() }} />

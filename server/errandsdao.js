@@ -13,12 +13,12 @@ const errandDao = {
         return mysqlConn.query("select * from errands where id = ?", id);
     },
 
-    updateToRunningState(errand, runner, fee){
-        return mysqlConn.query("update errands set runner = ?, fee = ? where id = ? ", [runner, fee, errand]);
+    updateToRunningState(errandId, runnerId, fee){
+        return mysqlConn.query("update errands set runner_id = ?, fee = ? where id = ? ", [runnerId, fee, errandId]);
     },
 
     getMyErrands(id){
-        return mysqlConn.query("select * from errands where runner = ? or poster = ?", [id, id]);
+        return mysqlConn.query("select * from errands where runner_id = ? or poster_id = ?", [id, id]);
     }
 }
 

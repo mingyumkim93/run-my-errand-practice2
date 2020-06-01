@@ -9,14 +9,14 @@ let timersForOffer = {};
 
 function getNotificationForRunner(offer, content) {
     return {
-        id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.sender, relatedUser: offer.receiver,
+        id: uuid(), timestamp: new Date(), is_read: 0, sender_id: SYSTEM, receiver_id: offer.sender_id, related_user_id: offer.receiver_id,
         type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
     };
 };
 
 function getNotificationForPoster(offer, content) {
     return {
-        id: uuid(), createdAt: new Date(), isRead: 0, sender: SYSTEM, receiver: offer.receiver, relatedUser: offer.sender,
+        id: uuid(), timestamp: new Date(), is_read: 0, sender_id: SYSTEM, receiver_id: offer.receiver_id, related_user_id: offer.sender_id,
         type: NOTIFICATION, content: "offer id: " + offer.id + " " + content
     };
 };
@@ -25,13 +25,13 @@ function createNotifications(io, offer, content) {
     const notificationToRunner = getNotificationForRunner(offer, content);
     const notificationToPoster = getNotificationForPoster(offer, content);
     messageDao.createNewMessage(notificationToRunner).then(data => {
-        io.in(notificationToRunner.receiver).emit("message", notificationToRunner);
-        io.in(notificationToRunner.receiver).emit("offer-state-changed");
+        io.in(notificationToRunner.receiver_id).emit("message", notificationToRunner);
+        io.in(notificationToRunner.receiver_id).emit("offer-state-changed");
     }).catch(err => console.log(err));
 
     messageDao.createNewMessage(notificationToPoster).then(data => {
-        io.in(notificationToPoster.receiver).emit("message", notificationToPoster);
-        io.in(notificationToPoster.receiver).emit("offer-state-changed");
+        io.in(notificationToPoster.receiver_id).emit("message", notificationToPoster);
+        io.in(notificationToPoster.receiver_id).emit("offer-state-changed");
     }).catch(err => console.log(err));
 };
 
@@ -42,13 +42,13 @@ function setStateCheckTimeout(io, offer, lastTransitionTimestamp = undefined) {
         ...timersForOffer, [offer.id]: setTimeout(() => {
             stateTransitionDao.getCurrentState(offer.id).then(data => {
                 //if data===[]  >> no transition at all >> still initial state
-                if (!data[0]) createCanceledOfferDueToTimoutStateTransition(io, offer, offer.receiver);
+                if (!data[0]) createCanceledOfferDueToTimoutStateTransition(io, offer, offer.receiver_id);
                 //if there has been some state transition since the offer was created
                 else {
-                    if (data[0].new_state === "accepted") createCanceledOfferDueToTimoutStateTransition(io, offer, offer.sender);
+                    if (data[0].new_state === "accepted") createCanceledOfferDueToTimoutStateTransition(io, offer, offer.sender_id);
                 }
             }).catch(err => console.log(err));
-        }, lastTransitionTimestamp ? lastTransitionTimestamp - new Date() + tenSeconds : offer.createdAt - new Date() + tenSeconds)
+        }, lastTransitionTimestamp ? lastTransitionTimestamp - new Date() + tenSeconds : offer.timestamp - new Date() + tenSeconds)
     };
 };
 
@@ -76,10 +76,10 @@ function createNewStateTransition(io, object_id, new_state, user_id, isOffer = t
 };
 
 function messageHandler(io, socket, message) {
-    message = { ...message, createdAt: new Date(), isRead: 0, id: uuid() };
+    message = { ...message, timestamp: new Date(), is_read: 0, id: uuid() };
     messageDao.createNewMessage(message).then(data => {
-        io.in(message.receiver).emit("message", message);
-        io.in(message.sender).emit("message", message);
+        io.in(message.receiver_id).emit("message", message);
+        io.in(message.sender_id).emit("message", message);
         if (message.type === "OFFER") {
             createNotifications(io, message, "is sent");
             setStateCheckTimeout(io, message);
@@ -112,8 +112,8 @@ function offerStateChangeHandler(io, socket, payload) {
                     if (new_state === "confirmed") {
                         messageDao.getMessageById(object_id).then(data => {
                             if (data.length > 0) {
-                                createNewStateTransition(io, data[0].errand, "running", user_id, false);
-                                errandDao.updateToRunningState(data[0].errand, data[0].sender, data[0].fee)
+                                createNewStateTransition(io, data[0].errand_id, "running", user_id, false);
+                                errandDao.updateToRunningState(data[0].errand_id, data[0].sender_id, data[0].fee)
                                 .then(data => console.log("Errand is updated to running state. Think about what to do for client at this point"))
                                 .catch(err => console.log(err));
                             }
@@ -188,8 +188,8 @@ function initialCheckForTimeoutOffer(io) {
                 //if initial state
                 if (data.length === 0) {
                     //if timeout
-                    if (new Date() - offer.createdAt > tenSeconds) {
-                        createCanceledOfferDueToTimoutStateTransition(io, offer, offer.receiver);
+                    if (new Date() - offer.timestamp > tenSeconds) {
+                        createCanceledOfferDueToTimoutStateTransition(io, offer, offer.receiver_id);
                     }
                     //not timeout yet
                     else {
@@ -201,7 +201,7 @@ function initialCheckForTimeoutOffer(io) {
                     if (data[0].new_state === "accepted") {
                         //if timeout
                         if (new Date() - data[0].timestamp > tenSeconds) {
-                            createCanceledOfferDueToTimoutStateTransition(io, offer, offer.sender);
+                            createCanceledOfferDueToTimoutStateTransition(io, offer, offer.sender_id);
                         }
                         else {
                             setStateCheckTimeout(io, offer, data[0].timestamp);

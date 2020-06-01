@@ -23,7 +23,7 @@ module.exports = function (app) {
                 else{
                     hashPassword(req, res).then(hashedPassword=>{
                         req.body.password = hashedPassword;
-                        req.body.createdAt = new Date();
+                        req.body.timestamp = new Date();
                         req.body.id = uuid();
                         userDao.createNewUser(req.body, function(err,user){
                             // find a better way to handle this duplicated code

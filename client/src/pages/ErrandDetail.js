@@ -22,7 +22,7 @@ function ErrandDetail({ user }) {
     };
 
     function sendOffer() {
-        socket.emit("message", { content, fee, receiver: errand.poster, sender: user.id, type: "OFFER", errand: errand.id });
+        socket.emit("message", { content, fee, receiver_id: errand.poster_id, sender_id: user.id, type: "OFFER", errand_id: errand.id });
     };
 
     if (!errand) return (<div> loading...</div>);
@@ -40,7 +40,7 @@ function ErrandDetail({ user }) {
                 <button onClick={() => sendOffer()}>Send Offer</button>
             </div>
             {/* prevent user change url to whatever number && only authenticated user can send message */}
-            <div onClick={() => history.push(`/message/${errand.poster}`)}>Contact host</div>
+            <div onClick={() => history.push(`/message/${errand.poster_id}`)}>Contact host</div>
         </div>
     );
 };

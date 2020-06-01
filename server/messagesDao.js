@@ -1,27 +1,27 @@
 const mysqlConn = require("./mysqlhelper");
 
 const messagesDao = {
-    createNewMessage(message){
+    createNewMessage(message) {
         return mysqlConn.query("insert into messages set ?", message);
     },
 
-    getAllMessages(id){
-        return mysqlConn.query("select * from messages where sender=? or receiver=? order by createdAt", [id,id]);
+    getAllMessages(id) {
+        return mysqlConn.query("select * from messages where sender_id = ? or receiver_id = ? order by timestamp", [id, id]);
     },
 
-    getMessagesWithUser(othersId,myId){
-        return mysqlConn.query("select * from messages where (sender=? and receiver=?) or (sender=? and receiver=?)",[othersId, myId, myId, othersId]);
-    },
-    
-    markMessagesAsRead(myId,othersId){
-        return mysqlConn.query("update messages set isRead = 1 where (sender=? and receiver=?) or (receiver=? and relatedUser=?)",[othersId, myId, myId, othersId]);
+    getMessagesWithUser(othersId, myId) {
+        return mysqlConn.query("select * from messages where (sender_id = ? and receiver_id = ?) or (sender_id = ? and receiver_id = ?)", [othersId, myId, myId, othersId]);
     },
 
-    getMessageById(id){
+    markMessagesAsRead(myId, othersId) {
+        return mysqlConn.query("update messages set is_read = 1 where (sender_id = ? and receiver_id = ?) or (receiver_id = ? and related_user_id = ?)", [othersId, myId, myId, othersId]);
+    },
+
+    getMessageById(id) {
         return mysqlConn.query("select * from messages where id = ?", id);
     },
 
-    getMessagesByType(type){
+    getMessagesByType(type) {
         return mysqlConn.query("select * from messages where type = ?", type);
     }
 };

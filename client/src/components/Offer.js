@@ -37,8 +37,8 @@ function Offer({ message, user }) {
     if (offerState === "initial")
         return (
             <>
-                {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
-                {message.sender === user.id ? <button className="offer-control-btn" onClick={() => changeOfferState("canceled")}>Withdraw</button> :
+                {message.sender_id} : {message.content} {message.timestamp} Fee : {message.fee}
+                {message.sender_id === user.id ? <button className="offer-control-btn" onClick={() => changeOfferState("canceled")}>Withdraw</button> :
                     <button className="offer-control-btn" onClick={() => changeOfferState("accepted")}>Accept</button>}
             </>
         );
@@ -46,8 +46,8 @@ function Offer({ message, user }) {
     else if (offerState === "accepted")
         return (
             <>
-                {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
-                {message.sender === user.id ? <div>
+                {message.sender_id} : {message.content} {message.timestamp} Fee : {message.fee}
+                {message.sender_id === user.id ? <div>
                     <button className="offer-control-btn"  onClick={() => changeOfferState("confirmed")}>Confirm</button>
                     <button className="offer-control-btn"  onClick={() => changeOfferState("canceled")}>WithDraw</button>
                 </div> : <></>}
@@ -57,13 +57,13 @@ function Offer({ message, user }) {
     else if (offerState === "canceled")
         return (
             <>
-                (Canceled) {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
+                (Canceled) {message.sender_id} : {message.content} {message.timestamp} Fee : {message.fee}
             </>
         );
     else if (offerState === "confirmed")
         return (
             <>
-                (confirmed) {message.sender} : {message.content} {message.createdAt} Fee : {message.fee}
+                (confirmed) {message.sender_id} : {message.content} {message.timestamp} Fee : {message.fee}
             </>
         );
 

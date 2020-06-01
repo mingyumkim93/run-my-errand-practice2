@@ -6,8 +6,8 @@ module.exports = function (app) {
     });
 
     app.post("/message/create",(req,res) => {
-        req.body.createdAt = new Date();
-        req.body.isRead = 0;
+        req.body.timestamp = new Date();
+        req.body.is_read = 0;
         messagesDao.createNewMessage(req.body).then(data => res.send(data)).catch(err => res.send(err));
     });
 

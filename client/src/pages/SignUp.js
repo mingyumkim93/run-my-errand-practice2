@@ -25,7 +25,7 @@ export default function SignUp() {
             <input placeholder="Last Name" onChange={(e)=>setLastName(e.target.value)}></input>
             <button onClick={()=>{
                 if(validationEmail(email))
-                API.auth.signUp({email,password, firstName, lastName, authMethod:"internal"}).then((res)=>console.log(res));
+                API.auth.signUp({email, password, first_name: firstName, last_name: lastName, auth_method: "internal"}).then((res)=>console.log(res));
                 history.push("/");
                 }}>Sign up</button>
         </div>

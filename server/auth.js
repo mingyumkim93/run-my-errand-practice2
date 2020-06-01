@@ -45,10 +45,10 @@ module.exports = function (app) {
     }, (accessToken, refreshToken, profile, done) => {
         var user = {
             email: profile.email,
-            firstname: profile.given_name,
-            lastname: profile.family_name,
-            authMethod: profile.provider,
-            createdAt: new Date(),
+            first_name: profile.given_name,
+            last_name: profile.family_name,
+            auth_method: profile.provider,
+            timestamp: new Date(),
             id: uuid()
         };
 

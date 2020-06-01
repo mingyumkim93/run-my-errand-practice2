@@ -36,7 +36,7 @@ function Post({user}) {
                 description,
                 address,
                 coordinates: JSON.stringify(markerPosition),
-                poster: user.id,
+                poster_id: user.id,
                 fee
             })
                 .then((res) => history.push("/")).catch((err) => alert(err));

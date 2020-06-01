@@ -6,7 +6,7 @@ import MyErrand from "../components/MyErrand";
 function MyErrands({user}){
 
     const [myErrands, setMyErrands] = useState(null);
-    const [tab, setTab] = useState("poster");
+    const [tab, setTab] = useState("poster_id");
 
     useEffect(()=>{
         if(user)
@@ -18,8 +18,8 @@ function MyErrands({user}){
     return(
         <>
             <br/>
-            <button value="poster" onClick={(e)=>setTab(e.target.value)}>Posting</button>
-            <button value="runner" onClick={(e)=>setTab(e.target.value)}>Running</button>
+            <button value="poster_id" onClick={(e)=>setTab(e.target.value)}>Posting</button>
+            <button value="runner_id" onClick={(e)=>setTab(e.target.value)}>Running</button>
             <button onClick={()=>console.log(myErrands)}>see my errands</button>
             {myErrands && myErrands.filter(errand => errand[tab] === user.id).map(errand => <MyErrand key={errand.id} errand={errand} tab={tab} user={user} />)}
         </>

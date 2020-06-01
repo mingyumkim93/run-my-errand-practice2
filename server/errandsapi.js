@@ -4,7 +4,7 @@ const { uuid } = require("uuidv4");
 
 module.exports = function (app) {
     app.post("/errand/post", (req, res) => {
-        req.body.createdAt = new Date();
+        req.body.timestamp = new Date();
         req.body.id = uuid();
         errandDao.createNewErrand(req.body).then(data => res.send(data)).catch(err => res.send(err));
     });

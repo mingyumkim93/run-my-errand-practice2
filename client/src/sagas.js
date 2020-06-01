@@ -58,10 +58,10 @@ function* readMessages(action) {
             const state = yield select();
             const messages = state.messages;
             const updatedMessages = messages.map(message => {
-                if (message.sender === action.othersId && message.receiver === action.id)
-                    return { ...message, isRead: 1 }
-                else if(message.receiver === action.id && message.relatedUser === action.othersId){
-                    return { ...message, isRead: 1 }
+                if (message.sender_id === action.othersId && message.receiver_id === action.id)
+                    return { ...message, is_read: 1 }
+                else if(message.receiver_id === action.id && message.related_user_id === action.othersId){
+                    return { ...message, is_read: 1 }
                 }
                 else
                     return message

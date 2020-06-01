@@ -41,31 +41,31 @@ const reducer = createReducer(initialState, {
 
             if (message.type === "NOTIFICATION") {
                 //notification has receiver and anotherReceiver
-                if (!sortedMessages[message.relatedUser]) {
-                    sortedMessages = { ...sortedMessages, [message.relatedUser]: [message] };
+                if (!sortedMessages[message.related_user_id]) {
+                    sortedMessages = { ...sortedMessages, [message.related_user_id]: [message] };
                 }
                 else {
-                    sortedMessages[message.relatedUser].push(message);
+                    sortedMessages[message.related_user_id].push(message);
                 }
             }
             else {
 
-                if (message.sender !== action.payload) {
+                if (message.sender_id !== action.payload) {
                     // first message with this user
-                    if (!sortedMessages[message.sender]) {
-                        sortedMessages = { ...sortedMessages, [message.sender]: [message] };
+                    if (!sortedMessages[message.sender_id]) {
+                        sortedMessages = { ...sortedMessages, [message.sender_id]: [message] };
                     }
                     else {
-                        sortedMessages[message.sender].push(message);
+                        sortedMessages[message.sender_id].push(message);
                     }
                 }
                 // if the message is sent by me
                 else {
-                    if (!sortedMessages[message.receiver]) {
-                        sortedMessages = { ...sortedMessages, [message.receiver]: [message] };
+                    if (!sortedMessages[message.receiver_id]) {
+                        sortedMessages = { ...sortedMessages, [message.receiver_id]: [message] };
                     }
                     else {
-                        sortedMessages[message.receiver].push(message);
+                        sortedMessages[message.receiver_id].push(message);
                     }
                 }
             }

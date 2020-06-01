@@ -7,7 +7,7 @@ function MyErrand({errand, tab, user}){
         socket.emit("errand-state-transition", {object_id:errand.id, new_state, user_id:user.id});
     };
 
-    if(tab === "poster")
+    if(tab === "poster_id")
     return <>
         {errand && <div>{errand.id}</div>}
         {errand.state === "initial"? <button onClick={()=>changeErrandState("deleted")}>Delete</button> : 
@@ -15,7 +15,7 @@ function MyErrand({errand, tab, user}){
                                       <button onClick={()=>changeErrandState("deleted")}>Finish</button></>}
     </>
 
-    if(tab === "runner")
+    if(tab === "runner_id")
     return <>
         {errand && <div>{errand.id}<button onClick={()=>changeErrandState("unsuccessful")}>Cancel</button></div>}
     </>
