@@ -31,7 +31,7 @@ function Offer({ message, user }) {
 
     function changeOfferState(new_state){
         disableButtons();
-        socket.emit("offer-state-transition",{object_id: message.id, new_state})
+        socket.emit("offer-state-transition",{object_id: message.id, new_state, user_id: user.id})
     };
 
     if (offerState === "initial")

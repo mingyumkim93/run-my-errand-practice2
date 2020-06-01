@@ -1,4 +1,4 @@
-const { messageHandler, offerStateChangeHandler, initialCheckForTimeoutOffer } = require("./socket-handlers");
+const { messageHandler, offerStateChangeHandler, initialCheckForTimeoutOffer, errandStateChangeHandler } = require("./socket-handlers");
 
 module.exports = function (server) {
     const io = require("socket.io").listen(server);
@@ -10,5 +10,6 @@ module.exports = function (server) {
         socket.on("join", (id) => socket.join(id));
         socket.on("message", (message) => messageHandler(io, socket, message));
         socket.on("offer-state-transition", (payload) => offerStateChangeHandler(io, socket, payload));
+        socket.on("errand-state-transition", (payload) => errandStateChangeHandler(io, socket, payload));
     });
 }; 

@@ -31,7 +31,8 @@ function MenuBar({ user, signOut, messages, authCheck, addMessage, sortMessages 
       socket.emit("join", user.id);
       socket.on("message", (message) => addMessage(message));
       socket.on("message-error", () => alert("something went wrong with message"));
-      socket.on("not-allowed-offer-state-transition", () => alert("Not allowed that offer state transition!"))
+      socket.on("not-allowed-offer-state-transition", () => alert("Not allowed that offer state transition!"));
+      socket.on("not-allowed-errand-state-transition", () => alert("Not allowed that errand state transition!"));
     }
   }, [user, addMessage]);
 
