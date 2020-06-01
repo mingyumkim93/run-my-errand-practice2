@@ -1,6 +1,7 @@
 const messageDao = require("./messagesDao");
 const stateTransitionDao = require("./statetransitiondao");
 const errandDao = require("./errandsdao");
+const reviewsDao = require("./reviewsdao");
 const tenSeconds = 1000 * 10;
 const SYSTEM = "SYSTEM";
 const NOTIFICATION = "NOTIFICATION";
@@ -156,6 +157,10 @@ function errandStateChangeHandler(io, socket, payload) {
             case "running":{
                 if(new_state === "canceled" || new_state === "unsuccessful" ||new_state === "successful"){
                     createNewStateTransition(io, object_id, new_state, user_id, false);
+                    const review = {comment:"This user has canceled an errand", timestamp: new Date(), to_user_id: user_id, errand_id: object_id};
+                    reviewsDao.createReview(review).then(data => {
+                        //what to do here ? 
+                    }).catch(err => console.log(err));
                 }
                 else{
                     socket.emit("not-allowed-errand-state-transition");

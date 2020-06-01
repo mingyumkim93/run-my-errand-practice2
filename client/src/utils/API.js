@@ -47,12 +47,8 @@ export default {
         }
     },
     stateTransition: {
-        createNewTransition(payload) {
-            return axios.post("/state-transition/create", payload);
-        },
         getCurrentState(payload) {
             return axios.get("/state-transition", { params: { id: payload } })
         }
-
     }
 }
